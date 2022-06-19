@@ -1,3 +1,4 @@
+import 'package:akioo_mobile/photo_feed/post.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -21,16 +22,22 @@ class _PhotoFeedPageState extends State<PhotoFeedPage> {
         ),
         backgroundColor: Colors.black,
       ),
-      body: GridView(
-        gridDelegate:
-            const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 1),
-        children: [
-          Image.network('https://picsum.photos/250?image=1'),
-          Image.network('https://picsum.photos/250?image=2'),
-          Image.network('https://picsum.photos/250?image=3'),
-        ],
-        shrinkWrap: true,
+      body: SingleChildScrollView(
+        child: Column(
+          children: const [
+            Post(
+              imageUrl: "https://picsum.photos/250?image=1",
+            ),
+            Post(
+              imageUrl: "https://picsum.photos/250?image=2",
+            ),
+            Post(
+              imageUrl: "https://picsum.photos/250?image=3",
+            )
+          ],
+        ),
       ),
     );
+    // shrinkWrap:
   }
 }
