@@ -1,5 +1,5 @@
-import 'package:akioo_mobile/home_page/home_page.dart';
-import 'package:akioo_mobile/themes.dart';
+import 'package:akio_mobile/home_page/home_page.dart';
+import 'package:akio_mobile/themes.dart';
 import 'package:flutter/material.dart';
 
 

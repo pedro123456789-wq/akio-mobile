@@ -1,4 +1,4 @@
-import 'package:akioo_mobile/photo_feed/post.dart';
+import 'package:akio_mobile/photo_feed/post.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 

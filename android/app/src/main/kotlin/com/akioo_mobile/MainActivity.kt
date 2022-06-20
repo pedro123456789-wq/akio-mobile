@@ -1,4 +1,4 @@
-package com.akioo_mobile
+package com.akio_mobile
 
 import io.flutter.embedding.android.FlutterActivity
 

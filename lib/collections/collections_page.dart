@@ -1,4 +1,4 @@
-import 'package:akioo_mobile/collections/collection_item.dart';
+import 'package:akio_mobile/collections/collection_item.dart';
 import 'package:flutter/material.dart';
 
 class CollectionsPage extends StatefulWidget {
