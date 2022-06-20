@@ -13,7 +13,7 @@ class AppRoot extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: Themes.globalTheme,
-      title: "Akio",
+      title: "akio.",
       home: const HomePage(),
     );
   }

@@ -15,7 +15,7 @@ class _PhotoFeedPageState extends State<PhotoFeedPage> {
       appBar: AppBar(
         title: Center(
           child: Text(
-            'Akioo.',
+            'akio.',
             style: Theme.of(context).textTheme.headline1,
           ),
         ),
