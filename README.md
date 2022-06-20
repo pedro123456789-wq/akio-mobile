@@ -1,6 +1,6 @@
-# akioo_mobile
+# akio_mobile
 
-Akioo - High quality streetwear
+akio - High quality streetwear
 
 ## Getting Started
 

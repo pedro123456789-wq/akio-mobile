@@ -1,11 +1,11 @@
 {
-    "name": "akioo_mobile",
-    "short_name": "akioo_mobile",
+    "name": "akio_mobile",
+    "short_name": "akio_mobile",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "Akioo - High quality streetwear",
+    "description": "akio - High quality streetwear",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
