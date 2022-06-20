@@ -9,7 +9,7 @@ class Themes {
     colorScheme: ColorScheme.fromSwatch().copyWith(secondary: Colors.white),
     textTheme: const TextTheme(
       headline1: TextStyle(
-        fontSize: 40.0,
+        fontSize: 30.0,
         fontWeight: FontWeight.bold,
         fontFamily: 'LibreBodoni',
       ),

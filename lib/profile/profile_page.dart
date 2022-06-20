@@ -17,7 +17,12 @@ class _ProfilePageState extends State<ProfilePage> {
             'Profile',
             style: Theme.of(context).textTheme.headline1,
           ),
-        )
+        ),
+        Container(
+          margin: EdgeInsets.only(top: 10),
+          height: 40,
+          decoration: const BoxDecoration(color: Colors.white),
+        ),
       ],
     );
   }
