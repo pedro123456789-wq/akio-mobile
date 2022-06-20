@@ -1,4 +1,6 @@
+import 'package:akio_mobile/device_info.dart';
 import 'package:flutter/material.dart';
+
 
 class Post extends StatefulWidget {
   final String imageUrl;
@@ -25,15 +27,19 @@ class _PostState extends State<Post> {
           Radius.circular(5),
         ),
       ),
-      margin: const EdgeInsets.all(15),
-      padding: const EdgeInsets.only(top: 20),
+      margin: EdgeInsets.all(
+        DeviceInfo.deviceWidth(context) * 0.05,
+      ),
+      padding: EdgeInsets.only(
+        top: DeviceInfo.deviceHeight(context) * 0.05,
+      ),
       child: Column(
         children: [
           Image.network(widget.imageUrl),
           Container(
-            margin: const EdgeInsets.only(
-              top: 30,
-              right: 20
+            margin: EdgeInsets.only(
+              top: DeviceInfo.deviceHeight(context) * 0.01,
+              right: DeviceInfo.deviceWidth(context) * 0.02,
             ),
             child: Row(
               textDirection: TextDirection.rtl,

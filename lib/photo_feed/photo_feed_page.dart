@@ -1,5 +1,4 @@
 import 'package:akio_mobile/photo_feed/post.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class PhotoFeedPage extends StatefulWidget {
@@ -16,7 +15,7 @@ class _PhotoFeedPageState extends State<PhotoFeedPage> {
       appBar: AppBar(
         title: Center(
           child: Text(
-            'Akio.',
+            'Akioo.',
             style: Theme.of(context).textTheme.headline1,
           ),
         ),
