@@ -15,9 +15,20 @@ class _CollectionsPageState extends State<CollectionsPage> {
       appBar: AppBar(
         backgroundColor: Colors.black,
         title: Center(
-          child: Text(
-            'Collections',
-            style: Theme.of(context).textTheme.headline1,
+          child: Row(
+            children: [
+              Text(
+                'Collections',
+                style: Theme.of(context).textTheme.headline1,
+              ),
+              ElevatedButton(
+                onPressed: () => print('pressed'),
+                child: const Icon(
+                  Icons.qr_code_scanner,
+                ),
+              )
+            ],
+            mainAxisAlignment: MainAxisAlignment.center,
           ),
         ),
       ),
