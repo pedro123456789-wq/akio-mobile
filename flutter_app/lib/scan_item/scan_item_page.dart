@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:nfc_manager/nfc_manager.dart';
 
 class ScanItemPage extends StatefulWidget {
   const ScanItemPage({Key? key}) : super(key: key);
@@ -8,6 +11,42 @@ class ScanItemPage extends StatefulWidget {
 }
 
 class _ScanItemPageState extends State<ScanItemPage> {
+  @override
+  void initState() {
+    super.initState();
+    startTagScan();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    stopTagScan();
+  }
+
+  Future<void> startTagScan() async {
+    // bool isAvailable = await NfcManager.instance.isAvailable();
+
+    NfcManager.instance.startSession(
+      onDiscovered: (NfcTag tag) async {
+        // Do something with an NfcTag instance.
+        Ndef? ndef = Ndef.from(tag);
+        NdefMessage? data = await ndef?.read();
+        if (data != null) {
+          Utf8Decoder decode = const Utf8Decoder();
+          var contents = data.records.last.payload;
+
+          String stringContents = decode.convert(contents);
+
+          print(stringContents);
+        }
+      },
+    );
+  }
+
+  void stopTagScan() {
+    NfcManager.instance.stopSession();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
