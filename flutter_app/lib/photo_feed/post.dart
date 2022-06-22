@@ -1,7 +1,6 @@
 import 'package:akio_mobile/device_info.dart';
 import 'package:flutter/material.dart';
 
-
 class Post extends StatefulWidget {
   final String imageUrl;
 
