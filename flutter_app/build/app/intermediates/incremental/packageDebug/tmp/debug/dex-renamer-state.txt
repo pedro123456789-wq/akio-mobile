@@ -1,4 +1,0 @@
-#Tue Jun 21 20:59:41 BST 2022
-base.0=C\:\\Users\\pl156\\Documents\\akioo-mobile\\akioo_mobile\\build\\app\\intermediates\\dex\\debug\\mergeDexDebug\\classes.dex
-path.0=classes.dex
-renamed.0=classes.dex
