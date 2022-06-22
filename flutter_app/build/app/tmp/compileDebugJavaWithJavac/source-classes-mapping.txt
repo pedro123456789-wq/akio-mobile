@@ -1,0 +1,4 @@
+io/flutter/plugins/GeneratedPluginRegistrant.java
+ io.flutter.plugins.GeneratedPluginRegistrant
+com/akio_mobile/BuildConfig.java
+ com.akio_mobile.BuildConfig
