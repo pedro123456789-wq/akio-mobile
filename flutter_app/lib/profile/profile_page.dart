@@ -24,7 +24,8 @@ class _ProfilePageState extends State<ProfilePage>
     _expandAnimation = Tween<Offset>(
       begin: const Offset(0.0, 1.0),
       end: Offset.zero,
-    ).animate(_controller);
+    ).chain(CurveTween(curve: Curves.easeOut))
+        .animate(_controller);
 
     _controller.forward();
   }
