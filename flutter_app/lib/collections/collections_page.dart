@@ -24,7 +24,7 @@ class _CollectionsPageState extends State<CollectionsPage> {
               ElevatedButton(
                 onPressed: () => print('pressed'),
                 child: const Icon(
-                  Icons.qr_code_scanner,
+                  Icons.contactless_outlined,
                 ),
               )
             ],
