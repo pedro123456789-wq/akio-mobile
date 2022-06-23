@@ -1,4 +1,5 @@
 import 'package:akio_mobile/collections/collection_item.dart';
+import 'package:akio_mobile/scan_item/scan_item_page.dart';
 import 'package:flutter/material.dart';
 
 class CollectionsPage extends StatefulWidget {
@@ -9,6 +10,16 @@ class CollectionsPage extends StatefulWidget {
 }
 
 class _CollectionsPageState extends State<CollectionsPage> {
+  void _nfcPressed(BuildContext context) {
+    print("Pressed");
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (BuildContext context) {
+          print("Building...");
+          return const ScanItemPage();
+        }
+    ));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,13 +33,13 @@ class _CollectionsPageState extends State<CollectionsPage> {
                 style: Theme.of(context).textTheme.headline1,
               ),
               ElevatedButton(
-                onPressed: () => print('pressed'),
+                onPressed: () => _nfcPressed(context),
                 child: const Icon(
                   Icons.contactless_outlined,
                 ),
               )
             ],
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
           ),
         ),
       ),
