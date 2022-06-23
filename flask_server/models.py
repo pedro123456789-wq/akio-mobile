@@ -15,7 +15,7 @@ class User(db.Model):
     hashed_password = db.Column(db.String(100), nullable=False)
 
     # For avatar
-    clothing_id = db.Column(db.Integer, db.ForeignKey("ClothingVariant.uuid"))
+    clothing_id = db.Column(db.Integer, db.ForeignKey("clothing_variant.uuid"))
     background_colour = db.Column(db.String(100), nullable=False)
 
     # Posts
