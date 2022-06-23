@@ -59,15 +59,19 @@ class _ScanItemPageState extends State<ScanItemPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Center(
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        title: Center(
           child: Text(
-            'Scan Item',
-            style: Theme.of(context).textTheme.headline1,
-          ),
+            'Scan clothing',
+            style: Theme.of(context).textTheme.headline1
+          )
         )
-      ],
+      ),
+      body: Text(
+        "HOHOHOHO"
+      )
     );
   }
 }

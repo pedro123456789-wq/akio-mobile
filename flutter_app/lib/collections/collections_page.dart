@@ -2,22 +2,10 @@ import 'package:akio_mobile/collections/collection_item.dart';
 import 'package:akio_mobile/scan_item/scan_item_page.dart';
 import 'package:flutter/material.dart';
 
-class CollectionsPage extends StatefulWidget {
-  const CollectionsPage({Key? key}) : super(key: key);
-
-  @override
-  _CollectionsPageState createState() => _CollectionsPageState();
-}
-
-class _CollectionsPageState extends State<CollectionsPage> {
+class _HomeRoute extends StatelessWidget {
   void _nfcPressed(BuildContext context) {
     print("Pressed");
-    Navigator.of(context).push(MaterialPageRoute(
-        builder: (BuildContext context) {
-          print("Building...");
-          return const ScanItemPage();
-        }
-    ));
+    Navigator.of(context).pushNamed('/scan');
   }
 
   @override
@@ -30,7 +18,10 @@ class _CollectionsPageState extends State<CollectionsPage> {
             children: [
               Text(
                 'Collections',
-                style: Theme.of(context).textTheme.headline1,
+                style: Theme
+                    .of(context)
+                    .textTheme
+                    .headline1,
               ),
               ElevatedButton(
                 onPressed: () => _nfcPressed(context),
@@ -77,6 +68,47 @@ class _CollectionsPageState extends State<CollectionsPage> {
           ],
         ),
       ),
+    );
+  }
+
+}
+
+class CollectionsPage extends StatefulWidget {
+  const CollectionsPage({Key? key}) : super(key: key);
+
+  @override
+  _CollectionsPageState createState() => _CollectionsPageState();
+}
+
+class _CollectionsPageState extends State<CollectionsPage> {
+  Future<bool> _canPop(BuildContext context) async {
+    print("hasdhashdsahdhas");
+    // print(await Navigator.of(context).maybePop());
+    Navigator.of(context).pushNamed("/");
+    return false;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return WillPopScope(
+        child: Navigator(
+          initialRoute: '/',
+          onGenerateRoute: (RouteSettings settings) {
+            WidgetBuilder builder;
+
+            switch (settings.name) {
+              case '/scan':
+                builder = (BuildContext context) => const ScanItemPage();
+                break;
+              default:
+                builder = (BuildContext context) => _HomeRoute();
+                break;
+            }
+
+            return MaterialPageRoute(builder: builder, settings: settings);
+          },
+        ),
+        onWillPop: () => _canPop(context)
     );
   }
 }
