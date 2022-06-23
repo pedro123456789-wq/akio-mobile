@@ -31,16 +31,20 @@ class _ScanItemPageState extends State<ScanItemPage> {
     if (nfcAvailable) {
       NfcManager.instance.startSession(
         onDiscovered: (NfcTag tag) async {
-          // Do something with an NfcTag instance.
           Ndef? ndef = Ndef.from(tag);
           NdefMessage? data = await ndef?.read();
+
           if (data != null) {
             Utf8Decoder decode = const Utf8Decoder();
-            var contents = data.records.last.payload;
+            var records = data.records;
 
-            String stringContents = decode.convert(contents);
+            records.forEach((record) {
+              var byteContent = record.payload;
 
-            print(stringContents);
+              String stringContents = decode.convert(byteContent);
+
+              print(stringContents);
+            });
           }
         },
       );
