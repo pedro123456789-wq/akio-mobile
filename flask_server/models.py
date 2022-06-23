@@ -1,3 +1,5 @@
+from flask_server import db
+
 # TODO: FINISH ME
 #       Relationships,
 #       Cascade behaviour
@@ -5,70 +7,77 @@
 # Images will refer to the name of the image, assigned via uuid, in the filesystem
 # Using String(100) since i doubt usernames, sizes, passwords, etc will ever exceed 100 characters, and postgresql requires a length to be provided with String
 
-class User(Model):
+
+class User(db.Model):
     __tablename__ = "user"
-    id = Column(Integer, primary_key=True)
-    username = Column(String(100), unique=True, nullable=False)
-    hashed_password = Column(String(100), nullable=False)
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(100), unique=True, nullable=False)
+    hashed_password = db.Column(db.String(100), nullable=False)
 
     # For avatar
-    clothing_id = Column(Integer, ForeignKey("ClothingVariant.uuid"))
-    background_colour = Column(String(100), nullable=False)
+    clothing_id = db.Column(db.Integer, db.ForeignKey("ClothingVariant.uuid"))
+    background_colour = db.Column(db.String(100), nullable=False)
 
     # Posts
-    liked_posts = relationship("Like", back_populates="user")
+    liked_posts = db.relationship("Like", backref="user")
 
     # Clothes
-    owned_clothes = relationship("ClothingItem", back_populates="user")
+    owned_clothes = db.relationship("ClothingItem", backref="user")
 
-class ClothingVariant(Model):
+
+class ClothingVariant(db.Model):
     __tablename__ = "clothing_variant"
-    uuid = Column(String(100), primary_key=True)  # Can be used to fetch the image from filesystem
+    # Can be used to fetch the image from filesystem
+    uuid = db.Column(db.String(100), primary_key=True)
     # Using as primary key will take up a bit more space in memory maybe, but means that any uuid checks can be completed instantly due to indexing (i think)
 
-    name = Column(String(100), nullable=False)
+    name = db.Column(db.String(100), nullable=False)
 
-    size_id = Column(Integer, ForeignKey("Size.id"), nullable=False)
-    colour_id = Column(Integer, ForeignKey("Colour.id"), nullable=False)
+    size_id = db.Column(db.Integer, db.ForeignKey("Size.id"), nullable=False)
+    colour_id = db.Column(db.Integer, db.ForeignKey("Colour.id"), nullable=False)
 
-    owners = relationship("ClothingItem", back_populates="variant")
+    # one to many relationship with ClothingItem(junction table) to form many-to-many relationship with User
+    owners = db.relationship("ClothingItem", backref="variant")
 
 
-class Size(Model):
+class Size(db.Model):
     __tablename__ = "size"
-    id = Column(Integer, primary_key=True)
-    size = Column(String(100), nullable=False, unique=True)
+    id = db.Column(db.Integer, primary_key=True)
+    size = db.Column(db.String(100), nullable=False, unique=True)
 
 
-class Colour(Model):
+class Colour(db.Model):
     __tablename__ = "colour"
-    id = Column(Integer, primary_key=True)
-    colour = Column(String(100), nullable=False, unique=True)
+    id = db.Column(db.Integer, primary_key=True)
+    colour = db.Column(db.String(100), nullable=False, unique=True)
 
 
-class Post(Model):
+class Post(db.Model):
     __tablename__ = "post"
-    id = Column(Integer, primary_key=True) # Don't use uuid, because the association table Like, will repeat a long uuid lots of times in memory which is probs not good
-    uuid = Column(String(100), nullable=False)  # Used for accessing image file
-    date_posted = Column(DateTime, nullable=False)
-    poster_id = Column(Integer, ForeignKey("User.id"))
+    # Don't use uuid, because the association table Like, will repeat a long uuid lots of times in memory which is probs not good
+    id = db.Column(db.Integer, primary_key=True)
+    # Used for accessing image file
+    uuid = db.Column(db.String(100), nullable=False)
+    date_posted = db.Column(db.DateTime, nullable=False)
+    poster_id = db.Column(db.Integer, db.ForeignKey("User.id"))
 
-    liked_by = relationship("Like", back_populates="post")
+    liked_by = db.relationship("Like", backref="post")
 
 
-class Like(Model):
+class Like(db.Model):
     __tablename__ = "like"
-    user_id = Column(Integer, ForeignKey("User.id"), primary_key=True)
-    post_id = Column(Integer, ForeignKey("Post.uuid"), primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("User.id"), primary_key=True)
+    post_id = db.Column(db.Integer, db.ForeignKey(
+        "Post.uuid"), primary_key=True)
 
-    user = relationship("User", back_populates="liked_posts")
-    post = relationship("Post", back_populates="liked_by")
+    user = db.relationship("User", backref="liked_posts")
+    post = db.relationship("Post", backref="liked_by")
 
 
-class ClothingItem(Model):
+class ClothingItem(db.Model):
     __tablename__ = "clothing_item"
-    user_id = Column(Integer, ForeignKey("User.id"), primary_key=True)
-    variant_id = Column(Integer, ForeignKey("ClothingVariant.uuid"), primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("User.id"), primary_key=True)
+    variant_id = db.Column(db.Integer, db.ForeignKey("ClothingVariant.uuid"), primary_key=True)
 
-    user = relationship("User", back_populates="owned_clothes")
-    variant = relationship("ClothingVariant", back_populates="owners")
+    user = db.relationship("User", backref="owned_clothes")
+    variant = db.relationship("ClothingVariant", backref="owners")
