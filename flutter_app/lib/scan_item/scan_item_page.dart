@@ -11,6 +11,8 @@ class ScanItemPage extends StatefulWidget {
 }
 
 class _ScanItemPageState extends State<ScanItemPage> {
+  bool nfcAvailable = false;
+
   @override
   void initState() {
     super.initState();
@@ -24,27 +26,31 @@ class _ScanItemPageState extends State<ScanItemPage> {
   }
 
   Future<void> startTagScan() async {
-    // bool isAvailable = await NfcManager.instance.isAvailable();
+    nfcAvailable = await NfcManager.instance.isAvailable();
 
-    NfcManager.instance.startSession(
-      onDiscovered: (NfcTag tag) async {
-        // Do something with an NfcTag instance.
-        Ndef? ndef = Ndef.from(tag);
-        NdefMessage? data = await ndef?.read();
-        if (data != null) {
-          Utf8Decoder decode = const Utf8Decoder();
-          var contents = data.records.last.payload;
+    if (nfcAvailable) {
+      NfcManager.instance.startSession(
+        onDiscovered: (NfcTag tag) async {
+          // Do something with an NfcTag instance.
+          Ndef? ndef = Ndef.from(tag);
+          NdefMessage? data = await ndef?.read();
+          if (data != null) {
+            Utf8Decoder decode = const Utf8Decoder();
+            var contents = data.records.last.payload;
 
-          String stringContents = decode.convert(contents);
+            String stringContents = decode.convert(contents);
 
-          print(stringContents);
-        }
-      },
-    );
+            print(stringContents);
+          }
+        },
+      );
+    }
   }
 
   void stopTagScan() {
-    NfcManager.instance.stopSession();
+    if (nfcAvailable) {
+      NfcManager.instance.stopSession();
+    }
   }
 
   @override
