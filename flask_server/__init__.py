@@ -34,8 +34,6 @@ from flask_server import models
 if createNewDb:
     print('Creating new database')
     db.create_all()
-    
     # populate db with default admin account, colours and sizes
-
 
 from flask_server import views 
