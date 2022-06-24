@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 
 class _HomeRoute extends StatelessWidget {
   void _nfcPressed(BuildContext context) {
-    print("Pressed");
     Navigator.of(context).pushNamed('/scan');
   }
 
@@ -82,7 +81,6 @@ class CollectionsPage extends StatefulWidget {
 
 class _CollectionsPageState extends State<CollectionsPage> {
   Future<bool> _canPop(BuildContext context) async {
-    print("hasdhashdsahdhas");
     // print(await Navigator.of(context).maybePop());
     Navigator.of(context).pushNamed("/");
     return false;
@@ -90,7 +88,7 @@ class _CollectionsPageState extends State<CollectionsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
+    return WillPopScope( // This captures the android back button
         child: Navigator(
           initialRoute: '/',
           onGenerateRoute: (RouteSettings settings) {
