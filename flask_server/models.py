@@ -3,6 +3,7 @@ from flask_server import db
 # TODO: FINISH ME
 #       Relationships,
 #       Cascade behaviour
+#       Add email to use database to avoid mass account creation
 
 # Images will refer to the name of the image, assigned via uuid, in the filesystem
 # Using String(100) since i doubt usernames, sizes, passwords, etc will ever exceed 100 characters, and postgresql requires a length to be provided with String

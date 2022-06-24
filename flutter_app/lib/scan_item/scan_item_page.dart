@@ -11,6 +11,8 @@ class ScanItemPage extends StatefulWidget {
 }
 
 class _ScanItemPageState extends State<ScanItemPage> {
+  bool nfcAvailable = false;
+
   @override
   void initState() {
     super.initState();
@@ -24,40 +26,52 @@ class _ScanItemPageState extends State<ScanItemPage> {
   }
 
   Future<void> startTagScan() async {
-    // bool isAvailable = await NfcManager.instance.isAvailable();
+    nfcAvailable = await NfcManager.instance.isAvailable();
 
-    NfcManager.instance.startSession(
-      onDiscovered: (NfcTag tag) async {
-        // Do something with an NfcTag instance.
-        Ndef? ndef = Ndef.from(tag);
-        NdefMessage? data = await ndef?.read();
-        if (data != null) {
-          Utf8Decoder decode = const Utf8Decoder();
-          var contents = data.records.last.payload;
+    if (nfcAvailable) {
+      NfcManager.instance.startSession(
+        onDiscovered: (NfcTag tag) async {
+          Ndef? ndef = Ndef.from(tag);
+          NdefMessage? data = await ndef?.read();
 
-          String stringContents = decode.convert(contents);
+          if (data != null) {
+            Utf8Decoder decode = const Utf8Decoder();
+            var records = data.records;
 
-          print(stringContents);
-        }
-      },
-    );
+            records.forEach((record) {
+              var byteContent = record.payload;
+
+              String stringContents = decode.convert(byteContent);
+
+              print(stringContents);
+            });
+          }
+        },
+      );
+    }
   }
 
   void stopTagScan() {
-    NfcManager.instance.stopSession();
+    if (nfcAvailable) {
+      NfcManager.instance.stopSession();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Center(
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        title: Center(
           child: Text(
-            'Scan Item',
-            style: Theme.of(context).textTheme.headline1,
-          ),
+            'Scan clothing',
+            style: Theme.of(context).textTheme.headline1
+          )
         )
-      ],
+      ),
+      body: Text(
+        "HOHOHOHO"
+      )
     );
   }
 }

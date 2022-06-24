@@ -20,7 +20,6 @@ class _HomePageState extends State<HomePage> {
 
   final _pageOptions = const [
     PhotoFeedPage(),
-    ScanItemPage(),
     CollectionsPage(),
     ProfilePage()
   ];
@@ -36,10 +35,6 @@ class _HomePageState extends State<HomePage> {
             BottomNavigationBarItem(
               icon: Icon(Icons.home),
               label: 'Home',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.qr_code_scanner),
-              label: 'Scan',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.checkroom),
