@@ -20,8 +20,8 @@ if isDevMode:
     dbPath = 'test.db'
 else:
     dbPath = 'production.db'
-    cors = CORS(app, supports_credentials = True)
-
+    
+cors = CORS(app, supports_credentials = True)
 createNewDb = not isfile(f'flask_server/{dbPath}') 
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{dbPath}'
 
