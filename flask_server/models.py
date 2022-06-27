@@ -14,6 +14,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), unique=True, nullable=False)
     hashed_password = db.Column(db.String(100), nullable=False)
+    is_admin = db.Column(db.Boolean, default = False)
 
     # For avatar
     clothing_id = db.Column(db.Integer, db.ForeignKey("clothing_variant.uuid"))
@@ -68,8 +69,7 @@ class Post(db.Model):
 class Like(db.Model):
     __tablename__ = "like"
     user_id = db.Column(db.Integer, db.ForeignKey("User.id"), primary_key=True)
-    post_id = db.Column(db.Integer, db.ForeignKey(
-        "Post.uuid"), primary_key=True)
+    post_id = db.Column(db.Integer, db.ForeignKey("Post.uuid"), primary_key=True)
 
     user = db.relationship("User", backref="liked_posts")
     post = db.relationship("Post", backref="liked_by")
