@@ -6,9 +6,10 @@ from flask import request
 from flask_server import app, db
 from flask_server import encryptionHandler
 from flask_server import validation_schemas
+from flask_server.authentication import loginRequired, adminRequired
 from flask_server.models import User
 from flask_server.responses import customResponse
-from flask_server import validation_schemas
+
 
 
 @app.route("/api")
@@ -69,3 +70,54 @@ def login():
             return customResponse(False, "Incorrect password")
     else:
         return customResponse(False, "Account does not exist")
+    
+    
+@app.route('/api/clothing-items', methods = ['GET', 'POST', 'PUT'])
+@loginRequired()
+@adminRequired()
+def clothingItems():
+    if request.method == 'GET':
+        pass
+
+    elif request.method == 'POST':
+        pass 
+    
+    elif request.method == 'PUT':
+        pass 
+    
+    return 'Clothing items endpoint'
+    # Admikn endpoint 
+    # GET -> Return clothing variants already created
+    # POST -> Create new clothing variant
+    # PUT -> Edit or delete clothing variant 
+    
+    
+@app.route('/api/user/profile', methods = ['GET', 'POST', 'PUT'])
+def userProfile():
+    # GET -> return user's icon colour and clothing item 
+    # POST -> set user's icon colour and clothing item for the first time 
+    # PUT -> change user's icon colour and clothing item
+    
+    pass 
+
+@app.route('/api/user/clothing-items', methods = ['GET', 'POST', 'PUT'])
+@loginRequired()
+def userClothes():
+    pass 
+
+
+@app.route('/api/user/posts', methods = ['GET', 'POST', 'PUT'])
+@loginRequired()
+def userPosts():
+    pass 
+    
+    
+@app.route('/api/random-posts', methods = ['GET'])
+@loginRequired(methods = ['GET'])
+def getRandomPosts():
+    # Get random posts to display in the photo feed
+    pass 
+    
+
+    
+
