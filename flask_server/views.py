@@ -7,7 +7,7 @@ from flask_server import app, db
 from flask_server import encryption_handler
 from flask_server import validation_schemas
 from flask_server.authentication import login_required, admin_required
-from flask_server.models import User
+from flask_server.models import ClothingItem, ClothingVariant, User
 from flask_server.responses import custom_response
 
 
@@ -104,7 +104,25 @@ def user_profile():
 @app.route("/api/user/clothing-items", methods = ["GET", "POST", "PUT"])
 @login_required()
 def user_clothes():
-    pass 
+    data = request.get_json()
+    
+    # scan item 
+    if request.method == 'POST':
+        uuid = data.get('uuid')
+        
+        if not uuid:
+            return custom_response(False, 'You did not provide a valid uuid')
+        
+        targetUser = User.query.filter_by(username = data.get('username')).first()
+        targetItem = ClothingVariant.query.filter_by(uuid = uuid).first()
+        
+        if targetItem:
+            targetUser.owned_clothes.append(targetItem)
+            db.session.commit()
+            
+            return custom_response(True, 'Added item to your collections')
+        else:
+            return custom_response(False, 'The uuid entered is invalid')
 
 
 @app.route("/api/user/posts", methods = ["GET", "POST", "PUT"])
