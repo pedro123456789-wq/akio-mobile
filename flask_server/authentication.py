@@ -37,8 +37,7 @@ def loginRequired(methods=None):
                 # check if token is valid and has not expired
                 try:
                     decodedToken = jwt.decode(token, app.config["SECRET_KEY"])
-                    tokenUsername, tokenExpiration = decodedToken.get(
-                        "user"), decodedToken.get("exp")
+                    tokenUsername, tokenExpiration = decodedToken.get("user"), decodedToken.get("exp")
 
                     if tokenUsername != username:
                         return customResponse(False, "Token does not match username")

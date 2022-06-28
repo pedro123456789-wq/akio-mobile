@@ -19,6 +19,9 @@ class User(db.Model):
     # For avatar
     clothing_id = db.Column(db.Integer, db.ForeignKey("clothing_variant.uuid"))
     background_colour = db.Column(db.String(100), nullable=False)
+    
+    # posted posts 
+    posts_made = db.relationship("Posts", backref = "user")
 
     # Posts
     liked_posts = db.relationship("Like", backref="user")
@@ -35,8 +38,8 @@ class ClothingVariant(db.Model):
 
     name = db.Column(db.String(100), nullable=False)
 
-    size_id = db.Column(db.Integer, db.ForeignKey("Size.id"), nullable=False)
-    colour_id = db.Column(db.Integer, db.ForeignKey("Colour.id"), nullable=False)
+    size_id = db.Column(db.Integer, db.ForeignKey("size.id"), nullable=False)
+    colour_id = db.Column(db.Integer, db.ForeignKey("colour.id"), nullable=False)
 
     # one to many relationship with ClothingItem(junction table) to form many-to-many relationship with User
     owners = db.relationship("ClothingItem", backref="variant")
@@ -61,24 +64,18 @@ class Post(db.Model):
     # Used for accessing image file
     uuid = db.Column(db.String(100), nullable=False)
     date_posted = db.Column(db.DateTime, nullable=False)
-    poster_id = db.Column(db.Integer, db.ForeignKey("User.id"))
-
-    liked_by = db.relationship("Like", backref="post")
+    
+    poster_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    liked_by = db.relationship("like", backref="post")
 
 
 class Like(db.Model):
     __tablename__ = "like"
-    user_id = db.Column(db.Integer, db.ForeignKey("User.id"), primary_key=True)
-    post_id = db.Column(db.Integer, db.ForeignKey("Post.uuid"), primary_key=True)
-
-    user = db.relationship("User", backref="liked_posts")
-    post = db.relationship("Post", backref="liked_by")
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), primary_key=True)
+    post_id = db.Column(db.Integer, db.ForeignKey("post.uuid"), primary_key=True)
 
 
 class ClothingItem(db.Model):
     __tablename__ = "clothing_item"
-    user_id = db.Column(db.Integer, db.ForeignKey("User.id"), primary_key=True)
-    variant_id = db.Column(db.Integer, db.ForeignKey("ClothingVariant.uuid"), primary_key=True)
-
-    user = db.relationship("User", backref="owned_clothes")
-    variant = db.relationship("ClothingVariant", backref="owners")
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), primary_key=True)
+    variant_id = db.Column(db.Integer, db.ForeignKey("clothing_variant.uuid"), primary_key=True)
