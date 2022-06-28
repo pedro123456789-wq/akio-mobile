@@ -4,14 +4,14 @@ from datetime import datetime
 from pydantic import ValidationError
 
 from flask_server import app
-from flask_server.responses import customResponse
+from flask_server.responses import custom_response
 from flask_server.validation_schemas import SessionValidation
 from flask_server.models import User
 from flask import request
 
 
-def loginRequired(methods=None):
-    if methods == None:
+def login_required(methods=None):
+    if methods is None:
         methods = ["GET", "PUT", "POST"]
 
     def wrapper(function):
@@ -28,31 +28,32 @@ def loginRequired(methods=None):
                 try:
                     SessionValidation(**data)
                 except ValidationError as error:
-                    topError = error[0]
-                    errorString = f"{topError['message']} for {topError['loc']}"
-                    return customResponse(False, errorString)
+                    top_error = error[0]
+                    error_string = f"{top_error['message']} for {top_error['loc']}"
+                    return custom_response(False, error_string)
 
                 username, token = data.get("username"), data.get("token")
 
                 # check if token is valid and has not expired
                 try:
-                    decodedToken = jwt.decode(token, app.config["SECRET_KEY"])
-                    tokenUsername, tokenExpiration = decodedToken.get("user"), decodedToken.get("exp")
+                    decoded_token = jwt.decode(token, app.config["SECRET_KEY"])
+                    token_username, token_expiration = decoded_token.get(
+                        "user"), decoded_token.get("exp")
 
-                    if tokenUsername != username:
-                        return customResponse(False, "Token does not match username")
-                    elif datetime.fromtimestamp(tokenExpiration) < datetime.now():
-                        return customResponse(False, "Token has expired")
+                    if token_username != username:
+                        return custom_response(False, "Token does not match username")
+                    elif datetime.fromtimestamp(token_expiration) < datetime.now():
+                        return custom_response(False, "Token has expired")
                 except Exception:
-                    return customResponse(False, "Invalid token")
+                    return custom_response(False, "Invalid token")
 
             return function(*args, **kwargs)
         return decorated
     return wrapper
 
 
-def adminRequired(methods=None):
-    if methods == None:
+def admin_required(methods=None):
+    if methods is None:
         methods = ["GET", "POST", "PUT"]
 
     def wrapper(function):
@@ -66,12 +67,12 @@ def adminRequired(methods=None):
 
                 username = data.get('username')
                 if username:
-                    targetUser = User.query.filter_by(username=username).first()
+                    target_user = User.query.filter_by(username=username).first()
                     
-                    if not targetUser.is_admin:
-                        return customResponse(False, 'The given user is not an admin')
+                    if not target_user.is_admin:
+                        return custom_response(False, 'The given user is not an admin')
                 else:
-                    return customResponse(False, 'You did not send a username')
+                    return custom_response(False, 'You did not send a username')
 
                 return function(*args, **kwargs)
         return decorated

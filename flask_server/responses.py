@@ -1,7 +1,7 @@
 from flask import make_response, jsonify, Response
 
 
-def customResponse(success: bool, message: str = '', code: int = 404, **others) -> Response:
+def custom_response(success: bool, message: str = '', code: int = 404, **others) -> Response:
     """Wrapper for flask make_response function to make sending responses to front-end quicker
 
     Args:
@@ -13,11 +13,11 @@ def customResponse(success: bool, message: str = '', code: int = 404, **others) 
         Response: Response object ready to be sent
     """
     
-    newResponse = make_response(jsonify({
+    new_response = make_response(jsonify({
         "success": success,
         "message": message,
         **others
     }))
 
-    newResponse.status_code = 200 if success else code
-    return newResponse
+    new_response.status_code = 200 if success else code
+    return new_response

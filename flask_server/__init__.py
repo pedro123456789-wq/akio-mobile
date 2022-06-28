@@ -17,21 +17,21 @@ app.config['ENV'] = 'development'
 isDevMode = app.config['ENV'] == 'development'
 
 if isDevMode:
-    dbPath = 'test.db'
+    db_path = 'test.db'
 else:
-    dbPath = 'production.db'
+    db_path = 'production.db'
     
 cors = CORS(app, supports_credentials = True)
-createNewDb = not isfile(f'flask_server/{dbPath}') 
-app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{dbPath}'
+create_new_db = not isfile(f'flask_server/{db_path}')
+app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 
 db = SQLAlchemy(app)
 migrations = Migrate(app, db)
-encryptionHandler = Bcrypt()
+migration_handler = Bcrypt()
 
 from flask_server import models 
 
-if createNewDb:
+if create_new_db:
     print('Creating new database')
     db.create_all()
     # populate db with default admin account, colours and sizes
