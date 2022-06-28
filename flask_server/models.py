@@ -17,11 +17,12 @@ class User(db.Model):
     is_admin = db.Column(db.Boolean, default = False)
 
     # For avatar
-    clothing_id = db.Column(db.Integer, db.ForeignKey("clothing_variant.uuid"))
-    background_colour = db.Column(db.String(100), nullable=False)
+    # change to not nullable in future 
+    clothing_id = db.Column(db.Integer, db.ForeignKey("clothing_variant.uuid"), nullable = True)
+    background_colour = db.Column(db.String(100), nullable=True)
     
     # posted posts 
-    posts_made = db.relationship("Posts", backref = "user")
+    posts_made = db.relationship("Post", backref = "user")
 
     # Posts
     liked_posts = db.relationship("Like", backref="user")
@@ -34,8 +35,8 @@ class ClothingVariant(db.Model):
     __tablename__ = "clothing_variant"
     # Can be used to fetch the image from filesystem
     uuid = db.Column(db.String(100), primary_key=True)
+    
     # Using as primary key will take up a bit more space in memory maybe, but means that any uuid checks can be completed instantly due to indexing (i think)
-
     name = db.Column(db.String(100), nullable=False)
 
     size_id = db.Column(db.Integer, db.ForeignKey("size.id"), nullable=False)
@@ -66,7 +67,7 @@ class Post(db.Model):
     date_posted = db.Column(db.DateTime, nullable=False)
     
     poster_id = db.Column(db.Integer, db.ForeignKey("user.id"))
-    liked_by = db.relationship("like", backref="post")
+    liked_by = db.relationship("Like", backref="post")
 
 
 class Like(db.Model):

@@ -13,7 +13,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'test_key' #change in production
 app.config['JSON_SORT_KEYS'] = False
 app.config['ENV'] = 'development'
-
+app.config['DEBUG'] = True if app.config['ENV'] == 'development' else False 
 isDevMode = app.config['ENV'] == 'development'
 
 if isDevMode:
@@ -27,13 +27,20 @@ app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 
 db = SQLAlchemy(app)
 migrations = Migrate(app, db)
-migration_handler = Bcrypt()
+encryption_handler = Bcrypt()
 
 from flask_server import models 
 
 if create_new_db:
     print('Creating new database')
     db.create_all()
+    
+    # add defualt sizes to database 
+    small = models.Size(size = "small")
+    medium = models.Size(size = "medium")
+    large = models.Size(size = "large")
+    
+    
     # populate db with default admin account, colours and sizes
 
 from flask_server import views 
