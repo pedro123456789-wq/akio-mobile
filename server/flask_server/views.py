@@ -65,7 +65,7 @@ def login():
         target_password = target_user.hashed_password
 
         if encryption_handler.check_password_hash(target_password, password):
-            token = encode({"username": username, "exp": datetime.utcnow() + timedelta(hours=6)}, app.config["SECRET_KEY"])
+            token = encode({"username": username, "exp": datetime.utcnow() + timedelta(hours=6)}, app.config["SECRET_KEY"]).decode()
             return custom_response(True, "Login Completed", token=str(token))
         else:
             return custom_response(False, "Incorrect password")
@@ -104,13 +104,20 @@ def user_profile():
 @app.route("/api/user/clothing-items", methods = ["GET", "POST", "PUT"])
 @login_required()
 def user_clothes():
-    data = request.get_json()
+    if request.method == 'POST' or request.method == 'PUT':
+        data = request.get_json()
+    elif request.method == 'GET':
+        data = request.headers
+        
     
-    # scan item 
+    if request.method == 'GET':
+        pass  
+    
     if request.method == 'POST':
+        # allow user to add item to their collection by scanning it
         uuid = data.get('uuid')
         
-        if not uuid:
+        if not uuid or type(uuid) != int:
             return custom_response(False, 'You did not provide a valid uuid')
         
         targetUser = User.query.filter_by(username = data.get('username')).first()
@@ -118,11 +125,15 @@ def user_clothes():
         
         if targetItem:
             targetUser.owned_clothes.append(targetItem)
+            # also return information about the item
             db.session.commit()
             
             return custom_response(True, 'Added item to your collections')
         else:
-            return custom_response(False, 'The uuid entered is invalid')
+            return custom_response(False, 'No clothing item found for that uuid')
+        
+    elif request.method == 'PUT':
+        pass 
 
 
 @app.route("/api/user/posts", methods = ["GET", "POST", "PUT"])
