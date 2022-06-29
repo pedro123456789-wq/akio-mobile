@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "flask_server"
 version = "0.1.0"
-description = "Server for Akioo mobile app"
+description = "Server for akio mobile app"
 authors = ["."]
 
 [tool.poetry.dependencies]
