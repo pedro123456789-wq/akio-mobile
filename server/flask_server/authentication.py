@@ -21,16 +21,18 @@ def login_required(methods=None):
                 # for GET requests data will be sent in headers but for POST and PUT requests it will be sent as json in request body
                 if request.method == "GET":
                     data = request.headers
+                    data = {k.lower(): v for k, v in data.items()} #convert headers to lowercase, since headers must be case insensitive
                 else:
                     data = request.get_json()
-
+                    
                 # check if headers are valid with json schema
                 try:
                     SessionValidation(**data)
                 except ValidationError as error:
-                    top_error = error[0]
-                    error_string = f"{top_error['message']} for {top_error['loc']}"
+                    top_error = error.errors()[0]
+                    error_string = f"{top_error['msg']} for {top_error['loc']}"
                     return custom_response(False, error_string)
+
 
                 username, token = data.get("username"), data.get("token")
 
@@ -61,6 +63,7 @@ def admin_required(methods=None):
             if request.method in methods:
                 if request.method == 'GET':
                     data = request.headers
+                    data = {k.lower(): v for k, v in data.items()}
                 else:
                     data = request.get_json()
 
