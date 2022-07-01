@@ -34,13 +34,6 @@ from flask_server import models
 if create_new_db:
     print('Creating new database')
     db.create_all()
-    
-    # add defualt sizes to database 
-    small = models.Size(size = "small")
-    medium = models.Size(size = "medium")
-    large = models.Size(size = "large")
-    
-    
-    # populate db with default admin account, colours and sizes
+
 
 from flask_server import views 
