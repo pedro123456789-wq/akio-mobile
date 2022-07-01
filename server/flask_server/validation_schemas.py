@@ -13,3 +13,11 @@ class SessionValidation(BaseModel):
 class SignUp(BaseModel):
     username: str
     password: str
+    
+    
+"""/api/clothing-variants => POST"""
+class ClothingVariant(BaseModel):
+    uuid: int
+    name: str
+    size: str
+    colour: str
