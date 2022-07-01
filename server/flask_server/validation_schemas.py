@@ -21,3 +21,10 @@ class ClothingVariant(BaseModel):
     name: str
     size: str
     colour: str
+
+
+"""api/user/profile"""
+class ProfileData(BaseModel):
+    background_colour: str
+    clothing_uuid: int 
+    
