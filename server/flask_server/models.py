@@ -19,7 +19,7 @@ class User(db.Model):
     # For avatar
     # change to not nullable in future 
     clothing_id = db.Column(db.Integer, db.ForeignKey("clothing_variant.uuid"), nullable = True)
-    background_colour = db.Column(db.String(100), nullable=True)
+    background_colour = db.Column(db.String(100), nullable=True) #hex value
     
     # posted posts 
     posts_made = db.relationship("Post", backref = "user")
