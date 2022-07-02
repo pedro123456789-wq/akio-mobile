@@ -1,4 +1,5 @@
 from flask_server import db
+from datetime import datetime
 
 # TODO: FINISH ME
 #       Relationships,
@@ -64,7 +65,8 @@ class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     # Used for accessing image file
     uuid = db.Column(db.String(100), nullable=False)
-    date_posted = db.Column(db.DateTime, nullable=False)
+    date_posted = db.Column(db.DateTime, nullable=False, default = datetime.utcnow())
+    caption = db.Column(db.String(100), nullable = False)
     
     poster_id = db.Column(db.Integer, db.ForeignKey("user.id"))
     liked_by = db.relationship("Like", backref="post")
