@@ -1,6 +1,7 @@
 import 'package:akio_mobile/collections/collection_item.dart';
 import 'package:akio_mobile/scan_item/scan_item_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class _HomeRoute extends StatelessWidget {
   void _nfcPressed(BuildContext context) {
@@ -80,16 +81,29 @@ class CollectionsPage extends StatefulWidget {
 }
 
 class _CollectionsPageState extends State<CollectionsPage> {
+  // WillPopScope MUST be outside a navigator for it to handle the back button,
+  //    so this is used so that the inner navigator can be popped from the outside
+  //    https://github.com/flutter/flutter/issues/14083
+  final innerNavkey = GlobalKey<NavigatorState>();
+
   Future<bool> _canPop(BuildContext context) async {
-    // print(await Navigator.of(context).maybePop());
-    Navigator.of(context).pushNamed("/");
+
+    // If scan page is open, the return to collections page
+    // else, close the app
+    if (innerNavkey.currentState?.canPop() == true) {
+      innerNavkey.currentState?.pushNamed("/");
+    } else {
+      // This function won't work on iOS, but this code should also never be reached on iOS.
+      SystemChannels.platform.invokeMethod('SystemNavigator.pop');
+    }
+
     return false;
   }
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope( // This captures the android back button
-        child: Navigator(
+        return WillPopScope(child: Navigator(
+          key: innerNavkey,
           initialRoute: '/',
           onGenerateRoute: (RouteSettings settings) {
             WidgetBuilder builder;
@@ -105,8 +119,6 @@ class _CollectionsPageState extends State<CollectionsPage> {
 
             return MaterialPageRoute(builder: builder, settings: settings);
           },
-        ),
-        onWillPop: () => _canPop(context)
-    );
+        ), onWillPop: () => _canPop(context));
   }
 }
