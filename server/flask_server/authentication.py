@@ -30,7 +30,7 @@ def login_required(methods=None):
                     SessionValidation(**data)
                 except ValidationError as error:
                     top_error = error.errors()[0]
-                    error_string = f"{top_error['msg']} for {top_error['loc']}"
+                    error_string = f"{top_error['msg']} for {top_error['loc'][0]}"
                     return custom_response(False, error_string)
 
 
