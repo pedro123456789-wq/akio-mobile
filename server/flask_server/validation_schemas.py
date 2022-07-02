@@ -1,5 +1,6 @@
 from typing import List, Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
+from flask_server.models import ClothingVariant
 
 
 
@@ -16,7 +17,7 @@ class SignUp(BaseModel):
     
     
 """/api/clothing-variants => POST"""
-class ClothingVariant(BaseModel):
+class ClothingVariantValidator(BaseModel):
     uuid: int
     name: str
     size: str
@@ -27,4 +28,23 @@ class ClothingVariant(BaseModel):
 class ProfileData(BaseModel):
     background_colour: str
     clothing_uuid: int 
+    
+    @validator('clothing_uuid')
+    def is_valid(cls, v):
+        items = ClothingVariant.query.all()
+        uuids = [int(item.uuid) for item in items]
+        
+        if v not in uuids:
+            raise ValueError('Invalid uuid entered')
+        
+        return v
+    
+    
+    @validator('background_colour')
+    def is_hex(cls, v):
+        if len(v) != 7 or v[0] != '#':
+            raise ValueError('Invalid hex value')
+
+        return v
+    
     
