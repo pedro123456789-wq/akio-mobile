@@ -22,7 +22,7 @@ else:
     db_path = 'production.db'
     
 cors = CORS(app, supports_credentials = True)
-create_new_db = not isfile(f'flask_server/{db_path}')
+create_new_db = not isfile(f'server/flask_server/{db_path}')
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 
 db = SQLAlchemy(app)
