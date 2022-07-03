@@ -1,7 +1,6 @@
+import 'package:akio_mobile/collections/collections_page.dart';
 import 'package:akio_mobile/photo_feed/photo_feed_page.dart';
 import 'package:akio_mobile/profile/profile_page.dart';
-import 'package:akio_mobile/scan_item/scan_item_page.dart';
-import 'package:akio_mobile/collections/collections_page.dart';
 import 'package:flutter/material.dart';
 
 //Page which contains bottom navigation bar

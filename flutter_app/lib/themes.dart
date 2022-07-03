@@ -2,11 +2,28 @@ import 'package:flutter/material.dart';
 
 class Themes {
   static ThemeData globalTheme = ThemeData.dark().copyWith(
-    brightness: Brightness.light,
+    brightness: Brightness.dark,
     backgroundColor: Colors.black,
     scaffoldBackgroundColor: Colors.black,
     canvasColor: Colors.black,
-    colorScheme: ColorScheme.fromSwatch().copyWith(secondary: Colors.white),
+    appBarTheme: const AppBarTheme(
+      centerTitle: true,
+      color: Colors.black,
+    ),
+    inputDecorationTheme: const InputDecorationTheme(
+        // Login page input text field border colour
+        enabledBorder:
+            OutlineInputBorder(borderSide: BorderSide(color: Colors.grey)),
+        focusedBorder:
+            OutlineInputBorder(borderSide: BorderSide(color: Colors.white))),
+    colorScheme: ColorScheme.fromSwatch().copyWith(
+        // Trying to figure out which colour is which
+        primary: Colors.white,
+        background: Colors.black,
+        secondary: Colors.green,
+        outline: Colors.red,
+        onSecondary: Colors.purple,
+        surface: Colors.white),
     textTheme: const TextTheme(
       headline1: TextStyle(
         fontSize: 30.0,

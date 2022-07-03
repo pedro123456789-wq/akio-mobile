@@ -14,6 +14,7 @@ from flask_server import validation_schemas
 from flask_server.authentication import login_required, admin_required
 from flask_server.models import ClothingItem, ClothingVariant, User, Colour, Size, Post
 from flask_server.responses import custom_response
+from .util import extract_login_data, extract_data
 
 
 # TODO:
@@ -26,22 +27,12 @@ def home():
     return "api running..."
 
 
-# TODO: Test Endpoint
 @app.route("/api/sign-up", methods=["POST"])
 def sign_up():
     """Api endpoint to create new user account"""
-    data = request.get_json()
+    username, password = extract_login_data()
 
-    try:
-        validation_schemas.SignUp(**data)
-    except ValidationError as error:
-        top_error = error.errors()[0]
-        error_string = f"{top_error['msg']} for {top_error['loc'][0]}"
-        return custom_response(False, error_string)
-
-    username, password = data.get("username"), data.get("password")
-    hashed_password = encryption_handler.generate_password_hash(
-        password).decode("utf-8")
+    hashed_password = encryption_handler.generate_password_hash(password).decode("utf-8")
 
     # check if username is already in use
     matching_usernames = User.query.filter_by(username=username).all()
@@ -53,16 +44,19 @@ def sign_up():
                                 for _ in range(6)])  # pick 6 random letters (a - f) or numbers
 
     items = ClothingVariant.query.all()
-    random_uuid = int(choice(items).uuid)
+    random_uuid = str(choice(items).uuid)
 
     # if username is 'admin' and password is equal to secret key create admin account
     # checking if the password is equal to secret key ensures that normal users cannot create admin accounts
-    if username == 'admin' and password == app.config['SECRET_KEY']:
-        new_user = User(username=username,
-                        hashed_password=hashed_password,
-                        background_colour=random_hex,
-                        clothing_id=random_uuid,
-                        is_admin=True)
+    if username == 'admin':
+        if password == app.config['SECRET_KEY']:
+            new_user = User(username=username,
+                            hashed_password=hashed_password,
+                            background_colour=random_hex,
+                            clothing_id=random_uuid,
+                            is_admin=True)
+        else:
+            return custom_response(False, "Attempted to make admin account without the secret.")
     else:
         new_user = User(username=username,
                         hashed_password=hashed_password,
@@ -79,16 +73,8 @@ def sign_up():
 @app.route("/api/login", methods=["POST"])
 def login():
     """Api endpoint to create authenticated user session through jwt token"""
-    data = request.get_json()
+    username, password = extract_login_data()
 
-    try:
-        validation_schemas.SignUp(**data)
-    except ValidationError as error:
-        top_error = error.errors()[0]
-        error_string = f"{top_error['msg']} for {top_error['loc'][0]}"
-        return custom_response(False, error_string)
-
-    username, password = data.get("username"), data.get("password")
     target_user = User.query.filter_by(username=username).first()
 
     if target_user:
@@ -108,11 +94,7 @@ def login():
 @login_required()
 @admin_required()
 def clothing_items():
-    if request.method == 'POST' or request.method == 'PUT':
-        data = request.get_json()
-    elif request.method == 'GET':
-        data = request.headers
-        data = {k.lower(): v for k, v in data.items()}
+    data = extract_data()
 
     if request.method == "GET":
         variants = ClothingVariant.query.all()
@@ -197,11 +179,7 @@ def user_profile():
     # GET -> return user's icon colour and clothing item
     # PUT -> change user's icon colour and clothing item uuid
 
-    if request.method == 'POST' or request.method == 'PUT':
-        data = request.get_json()
-    elif request.method == 'GET':
-        data = request.headers
-        data = {k.lower(): v for k, v in data.items()}
+    data = extract_data()
 
     target_user = User.query.filter_by(username=data.get('username')).first()
 
@@ -241,11 +219,7 @@ def user_profile():
 @app.route("/api/user/clothing-items", methods=["GET", "POST"])
 @login_required()
 def user_clothes():
-    if request.method == 'POST' or request.method == 'PUT':
-        data = request.get_json()
-    elif request.method == 'GET':
-        data = request.headers
-        data = {k.lower(): v for k, v in data.items()}
+    data = extract_data()
 
     if request.method == 'GET':
         targetUser = User.query.filter_by(

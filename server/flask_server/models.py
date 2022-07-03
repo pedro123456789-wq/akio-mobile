@@ -18,9 +18,9 @@ class User(db.Model):
 
     # For avatar
     # change to not nullable in future 
-    clothing_id = db.Column(db.Integer, db.ForeignKey("clothing_variant.uuid"), nullable = True)
+    clothing_id = db.Column(db.String(100), db.ForeignKey("clothing_variant.uuid"), nullable = True)
     background_colour = db.Column(db.String(100), nullable=True) #hex value
-    
+
     # posted posts 
     posts_made = db.relationship("Post", backref = "user")
 
@@ -35,7 +35,7 @@ class ClothingVariant(db.Model):
     __tablename__ = "clothing_variant"
     # Can be used to fetch the image from filesystem
     uuid = db.Column(db.String(100), primary_key=True)
-    
+
     # Using as primary key will take up a bit more space in memory maybe, but means that any uuid checks can be completed instantly due to indexing (i think)
     name = db.Column(db.String(100), nullable=False)
 
@@ -65,8 +65,8 @@ class Post(db.Model):
     # Used for accessing image file
     uuid = db.Column(db.String(100), nullable=False)
     date_posted = db.Column(db.DateTime, nullable=False, default = datetime.utcnow())
-    caption = db.Column(db.String(100), nullable = False, default = "")
-    
+    caption = db.Column(db.String(100), nullable = False)
+
     poster_id = db.Column(db.Integer, db.ForeignKey("user.id"))
     liked_by = db.relationship("Like", backref="post")
 
@@ -74,10 +74,10 @@ class Post(db.Model):
 class Like(db.Model):
     __tablename__ = "like"
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), primary_key=True)
-    post_id = db.Column(db.Integer, db.ForeignKey("post.uuid"), primary_key=True)
+    post_id = db.Column(db.Integer, db.ForeignKey("post.id"), primary_key=True)
 
 
 class ClothingItem(db.Model):
     __tablename__ = "clothing_item"
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), primary_key=True)
-    variant_id = db.Column(db.Integer, db.ForeignKey("clothing_variant.uuid"), primary_key=True)
+    variant_id = db.Column(db.String(100), db.ForeignKey("clothing_variant.uuid"), primary_key=True)
