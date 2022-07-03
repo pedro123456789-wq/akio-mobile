@@ -1,9 +1,8 @@
 from datetime import datetime, timedelta
-from logging.config import valid_ident
 from os import path, listdir
 from pydantic import ValidationError
 from jwt import encode
-from random import choice
+from random import choice, sample
 from string import ascii_lowercase, digits
 import base64
 
@@ -268,24 +267,48 @@ def user_clothes():
             return custom_response(False, 'No clothing item found for that uuid')
 
 
+# TODO: Test endpoint
 @app.route("/api/user/posts", methods=["GET", "POST", "PUT"])
 @login_required()
 def user_posts():
     # GET -> See posts made by user
     # POST -> Publish new post
     # PUT -> delete post
-    
-    if request.method == 'POST' or request.method == 'PUT':
-        data = request.get_json()
-    elif request.method == 'GET':
-        data = request.headers
-        data = {k.lower(): v for k, v in data.items()}
+    data = extract_data()
         
     target_user = User.query.filter_by(username = data.get('username')).first()
 
     if request.method == 'GET':
-        # get all posts made by the user 
-        pass 
+        uuids = data.get('uuids')
+        posts = target_user.posts_made
+        output = []
+        
+        if uuids == 'all':
+            uuids = [post.uuid for post in posts]
+        else:
+            if type(uuids) != list:
+                return custom_response(False, 'uuids must have a type of list')
+        
+        for post in posts:
+            if post in uuids:
+                # get base64 string for image
+                if not path.isfile(f'./flask_server/post_images/{post.uuid}.png'):
+                    base64_string = ''
+                else:
+                    with open(f'./flask_server/clothing_images/{post.uuid}.png', 'rb') as image_file:
+                        base64_string = base64.b64encode(image_file.read())
+                        image_file.close()
+                        
+                output.append({
+                            'uuid': post.uuid, 
+                            'date_posted': post.date_posted,
+                            'caption': post.caption, 
+                            'likes': len(post.liked_by), 
+                            'image_data': base64_string
+                            })
+                
+        return custom_response(True, 'Fetched data successfully', data = output)
+                
     elif request.method == 'POST':
         try:
             validation_schemas.PostValidation(**data)
@@ -340,9 +363,17 @@ def get_random_posts():
     #           Like: add like to post
     # PUT -> reomove post (admin endpoint)
 
+    data = extract_data()
+    
     if request.method == 'GET':
-        pass
+        post_number = data.get('post_number') # number of posts to be fetched
+        posts = Post.query.all()
+        
+        # use random.sample to get random posts
+        
     elif request.method == 'POST':
+        # add like to post
+        # important to check if user has already liked the post
         pass
     elif request.method == 'PUT':
         pass
