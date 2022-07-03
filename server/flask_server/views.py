@@ -46,12 +46,15 @@ def sign_up():
 
     # if username is 'admin' and password is equal to secret key create admin account
     # checking if the password is equal to secret key ensures that normal users cannot create admin accounts
-    if username == 'admin' and password == app.config['SECRET_KEY']:
-        new_user = User(username=username,
-                        hashed_password=hashed_password, 
-                        background_colour=random_hex, 
-                        clothing_id=random_uuid, 
-                        is_admin=True)
+    if username == 'admin':
+        if password == app.config['SECRET_KEY']:
+            new_user = User(username=username,
+                            hashed_password=hashed_password,
+                            background_colour=random_hex,
+                            clothing_id=random_uuid,
+                            is_admin=True)
+        else:
+            return custom_response(False, "Attempted to make admin account without the secret.")
     else:
         new_user = User(username=username,
                         hashed_password=hashed_password, 
