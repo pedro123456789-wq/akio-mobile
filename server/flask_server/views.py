@@ -42,7 +42,7 @@ def sign_up():
                                 for _ in range(6)])  # pick 6 random letters (a - f) or numbers
 
     items = ClothingVariant.query.all()
-    random_uuid = int(choice(items).uuid)
+    random_uuid = str(choice(items).uuid)
 
     # if username is 'admin' and password is equal to secret key create admin account
     # checking if the password is equal to secret key ensures that normal users cannot create admin accounts
