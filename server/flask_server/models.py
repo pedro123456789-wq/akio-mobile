@@ -9,7 +9,6 @@ from datetime import datetime
 # Images will refer to the name of the image, assigned via uuid, in the filesystem
 # Using String(100) since i doubt usernames, sizes, passwords, etc will ever exceed 100 characters, and postgresql requires a length to be provided with String
 
-
 class User(db.Model):
     __tablename__ = "user"
     id = db.Column(db.Integer, primary_key=True)
@@ -66,7 +65,7 @@ class Post(db.Model):
     # Used for accessing image file
     uuid = db.Column(db.String(100), nullable=False)
     date_posted = db.Column(db.DateTime, nullable=False, default = datetime.utcnow())
-    caption = db.Column(db.String(100), nullable = False)
+    caption = db.Column(db.String(100), nullable = False, default = "")
     
     poster_id = db.Column(db.Integer, db.ForeignKey("user.id"))
     liked_by = db.relationship("Like", backref="post")
