@@ -19,13 +19,13 @@ Future<void> processTag(NfcTag tag) async {
     Utf8Decoder decode = const Utf8Decoder();
     var records = data.records;
 
-    records.forEach((record) {
+    for (var record in records) {
       var byteContent = record.payload;
 
       String stringContents = decode.convert(byteContent);
 
       print(stringContents);
-    });
+    }
   }
 }
 

@@ -45,12 +45,10 @@ class _ProfilePageState extends State<ProfilePage>
             top: DeviceInfo.deviceHeight(context) * 0.01,
           ),
           alignment: Alignment.center,
-          child: Container(
-            child: Text(
-              'Profile',
-              style: Theme.of(context).textTheme.headline1,
-              textAlign: TextAlign.left,
-            ),
+          child: Text(
+            'Profile',
+            style: Theme.of(context).textTheme.headline1,
+            textAlign: TextAlign.left,
           ),
         ),
         SlideTransition(
