@@ -1,7 +1,10 @@
 import 'package:akio_mobile/collections/collection_item.dart';
+import 'package:akio_mobile/login_page/login_page.dart';
 import 'package:akio_mobile/scan_item/scan_item_page.dart';
+import 'package:akio_mobile/state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 
 class _HomeRoute extends StatelessWidget {
   void _nfcPressed(BuildContext context) {
@@ -87,7 +90,6 @@ class _CollectionsPageState extends State<CollectionsPage> {
   final innerNavkey = GlobalKey<NavigatorState>();
 
   Future<bool> _canPop(BuildContext context) async {
-
     // If scan page is open, the return to collections page
     // else, close the app
     if (innerNavkey.currentState?.canPop() == true) {
@@ -102,23 +104,34 @@ class _CollectionsPageState extends State<CollectionsPage> {
 
   @override
   Widget build(BuildContext context) {
-        return WillPopScope(child: Navigator(
-          key: innerNavkey,
-          initialRoute: '/',
-          onGenerateRoute: (RouteSettings settings) {
-            WidgetBuilder builder;
+    return Consumer<AppModel>(
+      builder: (context, value, child) {
+        if (value.loggedIn) {
+          return WillPopScope(
+              child: Navigator(
+                key: innerNavkey,
+                initialRoute: '/',
+                onGenerateRoute: (RouteSettings settings) {
+                  WidgetBuilder builder;
 
-            switch (settings.name) {
-              case '/scan':
-                builder = (BuildContext context) => const ScanItemPage();
-                break;
-              default:
-                builder = (BuildContext context) => _HomeRoute();
-                break;
-            }
+                  switch (settings.name) {
+                    case '/scan':
+                      builder = (BuildContext context) => const ScanItemPage();
+                      break;
+                    default:
+                      builder = (BuildContext context) => _HomeRoute();
+                      break;
+                  }
 
-            return MaterialPageRoute(builder: builder, settings: settings);
-          },
-        ), onWillPop: () => _canPop(context));
+                  return MaterialPageRoute(
+                      builder: builder, settings: settings);
+                },
+              ),
+              onWillPop: () => _canPop(context));
+        } else {
+          return const LoginPage();
+        }
+      },
+    );
   }
 }

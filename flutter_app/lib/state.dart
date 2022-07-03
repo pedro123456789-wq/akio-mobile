@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class AppModel extends ChangeNotifier {
-  bool loggedIn = true; // Todo: logging in logic and stuff
+  bool loggedIn = false; // Todo: login system
 
   String? username;
 }

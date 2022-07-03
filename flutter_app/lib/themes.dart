@@ -6,7 +6,18 @@ class Themes {
     backgroundColor: Colors.black,
     scaffoldBackgroundColor: Colors.black,
     canvasColor: Colors.black,
-    colorScheme: ColorScheme.fromSwatch().copyWith(secondary: Colors.white),
+    inputDecorationTheme: const InputDecorationTheme(
+      // Login page input text field border colour
+      enabledBorder:
+          OutlineInputBorder(borderSide: BorderSide(color: Colors.orange)),
+    ),
+    colorScheme: ColorScheme.fromSwatch().copyWith(
+        // Trying to figure out which colour is which
+        primary: Colors.white,
+        secondary: Colors.green,
+        outline: Colors.red,
+        onSecondary: Colors.purple,
+        surface: Colors.amber),
     textTheme: const TextTheme(
       headline1: TextStyle(
         fontSize: 30.0,
