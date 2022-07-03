@@ -1,20 +1,22 @@
 from datetime import datetime, timedelta
 from logging.config import valid_ident
+from os import path, listdir
 from pydantic import ValidationError
 from jwt import encode
 from random import choice
 from string import ascii_lowercase, digits
+import base64
 
 from flask import request
 from flask_server import app, db
 from flask_server import encryption_handler
 from flask_server import validation_schemas
 from flask_server.authentication import login_required, admin_required
-from flask_server.models import ClothingItem, ClothingVariant, User, Colour, Size
+from flask_server.models import ClothingItem, ClothingVariant, User, Colour, Size, Post
 from flask_server.responses import custom_response
 
 
-# TODO: 
+# TODO:
 # Add better validation for scanning endpoint
 # add images to posts and clothing variants
 
@@ -38,7 +40,8 @@ def sign_up():
         return custom_response(False, error_string)
 
     username, password = data.get("username"), data.get("password")
-    hashed_password = encryption_handler.generate_password_hash(password).decode("utf-8")
+    hashed_password = encryption_handler.generate_password_hash(
+        password).decode("utf-8")
 
     # check if username is already in use
     matching_usernames = User.query.filter_by(username=username).all()
@@ -46,7 +49,7 @@ def sign_up():
         return custom_response(False, "The username is already taken")
 
     # generate random background colour and uuid for user profile
-    random_hex = '#' + ''.join([choice(list(ascii_lowercase)[0: 6] + list(digits)) 
+    random_hex = '#' + ''.join([choice(list(ascii_lowercase)[0: 6] + list(digits))
                                 for _ in range(6)])  # pick 6 random letters (a - f) or numbers
 
     items = ClothingVariant.query.all()
@@ -56,15 +59,15 @@ def sign_up():
     # checking if the password is equal to secret key ensures that normal users cannot create admin accounts
     if username == 'admin' and password == app.config['SECRET_KEY']:
         new_user = User(username=username,
-                        hashed_password=hashed_password, 
-                        background_colour=random_hex, 
-                        clothing_id=random_uuid, 
+                        hashed_password=hashed_password,
+                        background_colour=random_hex,
+                        clothing_id=random_uuid,
                         is_admin=True)
     else:
         new_user = User(username=username,
-                        hashed_password=hashed_password, 
-                        background_colour=random_hex, 
-                        clothing_id=random_uuid, 
+                        hashed_password=hashed_password,
+                        background_colour=random_hex,
+                        clothing_id=random_uuid,
                         is_admin=False)
 
     db.session.add(new_user)
@@ -100,7 +103,7 @@ def login():
     else:
         return custom_response(False, "Account does not exist")
 
-
+# allow user to send list of required uuids instead of sending whole collection of clothes 
 @app.route("/api/clothing-variants", methods=["GET", "POST", "PUT"])
 @login_required()
 @admin_required()
@@ -113,12 +116,24 @@ def clothing_items():
 
     if request.method == "GET":
         variants = ClothingVariant.query.all()
-        output = [{
-            'uuid': variant.uuid,
-            'name': variant.name,
-            'size':  Size.query.filter_by(id=variant.size_id).first().size,
-            'colour': Colour.query.filter_by(id=variant.colour_id).first().colour
-        } for variant in variants]
+        output = []
+
+        for variant in variants:
+            # get base64 for image
+            if not path.isfile(f'./flask_server/clothing_images/{variant.uuid}.png'):
+                base64_string = ''
+            else:
+                with open(f'./flask_server/clothing_images/{variant.uuid}.png', 'rb') as image_file:
+                    base64_string = base64.b64encode(image_file.read())
+                    image_file.close()
+                
+            output.append({
+                'uuid': variant.uuid,
+                'name': variant.name,
+                'size':  Size.query.filter_by(id=variant.size_id).first().size,
+                'colour': Colour.query.filter_by(id=variant.colour_id).first().colour,
+                'image_data': base64_string
+            })
 
         return custom_response(True, 'Fetched data successfully', data=output)
 
@@ -131,7 +146,7 @@ def clothing_items():
             error_string = f"{top_error['msg']} for {top_error['loc'][0]}"
             return custom_response(False, error_string)
 
-        uuid, name, colour, size = data.get('uuid'), data.get('name'), data.get('colour'), data.get('size')
+        uuid, name, colour, size, image_data = data.get('uuid'), data.get('name'), data.get('colour'), data.get('size'), data.get('image_data')
         targetColour = Colour.query.filter_by(colour=colour).first()
         targetSize = Size.query.filter_by(size=size).first()
 
@@ -146,6 +161,12 @@ def clothing_items():
             targetSize = Size(size=size)
             db.session.add(targetSize)
             db.session.flush()
+
+        # save image in clothing_images folder
+        clothing_image = base64.b64decode(image_data)
+        with open(f'./flask_server/clothing_images/{uuid}.png', 'wb') as image_file:
+            image_file.write(clothing_image)
+            image_file.close()
 
         # add new clothing variant
         newVariant = ClothingVariant(
@@ -185,10 +206,19 @@ def user_profile():
     target_user = User.query.filter_by(username=data.get('username')).first()
 
     if request.method == 'GET':
+         # get base64 string for image
+        if not path.isfile(f'./flask_server/clothing_images/{target_user.clothing_id}.png'):
+            base64_string = ''
+        else:
+            with open(f'./flask_server/clothing_images/{target_user.clothing_id}.png', 'rb') as image_file:
+                base64_string = base64.b64encode(image_file.read())
+                image_file.close()
+                
         output = {
             'username': data.get('username'),
             'background_colour': target_user.background_colour,  # hex value
-            'clothing_id': target_user.clothing_id
+            'clothing_id': target_user.clothing_id, 
+            'image_data': base64_string
         }
 
         return custom_response(True, 'Got profile data successfully', data=output)
@@ -224,13 +254,22 @@ def user_clothes():
 
         output = []
         for item in owned_clothes:
-            item_data = ClothingVariant.query.filter_by(
-                uuid=item.varient_id).first()
+            item_data = ClothingVariant.query.filter_by(uuid=item.varient_id).first()
+            
+            # get base64 string for image
+            if not path.isfile(f'./flask_server/clothing_images/{item_data.uuid}.png'):
+                base64_string = ''
+            else:
+                with open(f'./flask_server/clothing_images/{item_data.uuid}.png', 'rb') as image_file:
+                    base64_string = base64.b64encode(image_file.read())
+                    image_file.close()
+                    
             output.append({
                 'uuid': item_data.uuid,
                 'name': item_data.name,
                 'size': Size.query.filter_by(id=item_data.size_id).first().size,
-                'color': Colour.query.filter_by(id=item_data.colour_id).first().colour
+                'color': Colour.query.filter_by(id=item_data.colour_id).first().colour, 
+                'image_data': base64_string
             })
 
         return custom_response(True, 'Fetched data successfully', data=output)
@@ -242,8 +281,7 @@ def user_clothes():
         if not uuid or type(uuid) != int:
             return custom_response(False, 'You did not provide a valid uuid')
 
-        targetUser = User.query.filter_by(
-            username=data.get('username')).first()
+        targetUser = User.query.filter_by(username=data.get('username')).first()
         targetItem = ClothingVariant.query.filter_by(uuid=uuid).first()
 
         if targetItem:
@@ -263,29 +301,74 @@ def user_posts():
     # POST -> Publish new post
     # PUT -> delete post
     
+    if request.method == 'POST' or request.method == 'PUT':
+        data = request.get_json()
+    elif request.method == 'GET':
+        data = request.headers
+        data = {k.lower(): v for k, v in data.items()}
+        
+    target_user = User.query.filter_by(username = data.get('username')).first()
+
     if request.method == 'GET':
-        pass
-
+        # get all posts made by the user 
+        pass 
     elif request.method == 'POST':
-        pass 
+        try:
+            validation_schemas.PostValidation(**data)
+        except ValidationError as error:
+            top_error = error.errors()[0]
+            error_string = f"{top_error['msg']} for {top_error['loc'][0]}"
+            return custom_response(False, error_string)
+        
+        caption, image_data = data.get('caption'), data.get('image_data')
+        
+        # generate unique id for post 
+        uuid = len(listdir('./flask_server/post_images'))
+        
+        # add new post to database
+        new_post = Post(caption = caption, uuid = uuid, poster_id = target_user.id)
+        db.session.add(new_post)
+        db.session.commit()
+        
+        # save image in post_images folder
+        clothing_image = base64.b64decode(image_data)
+        with open(f'./flask_server/post_images/{uuid}.png', 'wb') as image_file:
+            image_file.write(clothing_image)
+            image_file.close()
+        
+        
+        return custom_response(True, 'Post made successfully')
     
+        
     elif request.method == 'PUT':
-        pass 
-
+        uuid = data.get('uuid')
+        post = Post.query.filter_by(uuid = uuid).first()
+        
+        # check if post exists
+        if post:
+            # check if user owns the post it is trying to delete
+            if post.poster_id == target_user.id:
+                db.session.delete(post)
+                db.session.commit()
+                return custom_response(True, 'Post deleted successfully')
+            else:
+                return custom_response(False, 'You do not own this post')
+        else:
+            return custom_response(False, 'Post does not exist')
+        
 
 
 @app.route("/api/posts", methods=["GET"])
 @login_required(methods=["GET"])
 def get_random_posts():
     # GET -> Get random posts for the user
-    # POST -> Actions: 
+    # POST -> Actions:
     #           Like: add like to post
-    # PUT -> reomove post (admin endpoint) 
-    
-    
+    # PUT -> reomove post (admin endpoint)
+
     if request.method == 'GET':
-        pass 
+        pass
     elif request.method == 'POST':
-        pass 
+        pass
     elif request.method == 'PUT':
-        pass 
+        pass

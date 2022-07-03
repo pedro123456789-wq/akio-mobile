@@ -22,6 +22,7 @@ class ClothingVariantValidator(BaseModel):
     name: str
     size: str
     colour: str
+    image_data: str
 
 
 """api/user/profile"""
@@ -46,5 +47,9 @@ class ProfileData(BaseModel):
             raise ValueError('Invalid hex value')
 
         return v
-    
+
+
+class PostValidation(BaseModel):
+    caption: str
+    image_data: str
     
