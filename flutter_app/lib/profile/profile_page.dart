@@ -44,11 +44,8 @@ class _ProfilePageState extends State<ProfilePage>
           padding: EdgeInsets.only(
             top: DeviceInfo.deviceHeight(context) * 0.01,
           ),
-          alignment: Alignment.topLeft,
+          alignment: Alignment.center,
           child: Container(
-            margin: EdgeInsets.only(
-              left: DeviceInfo.deviceWidth(context) * 0.1,
-            ),
             child: Text(
               'Profile',
               style: Theme.of(context).textTheme.headline1,

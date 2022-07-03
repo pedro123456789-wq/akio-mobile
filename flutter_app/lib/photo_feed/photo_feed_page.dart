@@ -19,7 +19,6 @@ class _PhotoFeedPageState extends State<PhotoFeedPage> {
             style: Theme.of(context).textTheme.headline1,
           ),
         ),
-        backgroundColor: Colors.black,
       ),
       body: SingleChildScrollView(
         child: Column(
