@@ -1,6 +1,8 @@
-import 'package:akio_mobile/home_page/home_page.dart';
+import 'package:akio_mobile/home_page/main_page.dart';
+import 'package:akio_mobile/state.dart';
 import 'package:akio_mobile/themes.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   runApp(const AppRoot());
@@ -15,7 +17,10 @@ class AppRoot extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: Themes.globalTheme,
       title: "akio.",
-      home: const HomePage(),
+      home: ChangeNotifierProvider(
+        create: (context) => AppModel(),
+        child: const HomePage()
+      ),
     );
   }
 }
