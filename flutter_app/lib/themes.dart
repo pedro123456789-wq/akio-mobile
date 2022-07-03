@@ -11,10 +11,11 @@ class Themes {
       color: Colors.black,
     ),
     inputDecorationTheme: const InputDecorationTheme(
-      // Login page input text field border colour
-      enabledBorder:
-          OutlineInputBorder(borderSide: BorderSide(color: Colors.orange)),
-    ),
+        // Login page input text field border colour
+        enabledBorder:
+            OutlineInputBorder(borderSide: BorderSide(color: Colors.grey)),
+        focusedBorder:
+            OutlineInputBorder(borderSide: BorderSide(color: Colors.white))),
     colorScheme: ColorScheme.fromSwatch().copyWith(
         // Trying to figure out which colour is which
         primary: Colors.white,
@@ -22,7 +23,7 @@ class Themes {
         secondary: Colors.green,
         outline: Colors.red,
         onSecondary: Colors.purple,
-        surface: Colors.amber),
+        surface: Colors.white),
     textTheme: const TextTheme(
       headline1: TextStyle(
         fontSize: 30.0,
