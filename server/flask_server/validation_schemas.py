@@ -4,47 +4,46 @@ from flask_server.models import ClothingVariant
 
 
 
-"""@loginRequired"""
 class SessionValidation(BaseModel):
+    """@loginRequired"""
     token: str
     username: str
-    
 
-"""/api/sign-up"""
+
 class SignUp(BaseModel):
+    """/api/sign-up"""
     username: str
     password: str
-    
-    
-"""/api/clothing-variants => POST"""
+
+
 class ClothingVariantValidator(BaseModel):
+    """/api/clothing-variants => POST"""
     uuid: int
     name: str
     size: str
     colour: str
 
 
-"""api/user/profile"""
 class ProfileData(BaseModel):
+    """api/user/profile"""
     background_colour: str
-    clothing_uuid: int 
-    
+    clothing_uuid: int
+
     @validator('clothing_uuid')
     def is_valid(cls, v):
         items = ClothingVariant.query.all()
         uuids = [int(item.uuid) for item in items]
-        
+
         if v not in uuids:
             raise ValueError('Invalid uuid entered')
-        
+
         return v
-    
-    
+
+
     @validator('background_colour')
     def is_hex(cls, v):
         if len(v) != 7 or v[0] != '#':
             raise ValueError('Invalid hex value')
 
         return v
-    
-    
+
