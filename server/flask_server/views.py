@@ -6,19 +6,19 @@ from random import choice, sample
 from string import ascii_lowercase, digits
 import base64
 
-from flask import request
+from flask import request, send_file
 from flask_server import app, db
 from flask_server import encryption_handler
 from flask_server import validation_schemas
 from flask_server.authentication import login_required, admin_required
-from flask_server.models import ClothingItem, ClothingVariant, User, Colour, Size, Post
+from flask_server.models import ClothingItem, ClothingVariant, User, Colour, Size, Post, Like
 from flask_server.responses import custom_response
 from .util import extract_login_data, extract_data
 
 
 # TODO:
 # Add better validation for scanning endpoint
-# add images to posts and clothing variants
+# change base64 to image url
 
 
 @app.route("/api")
@@ -31,7 +31,8 @@ def sign_up():
     """Api endpoint to create new user account"""
     username, password = extract_login_data()
 
-    hashed_password = encryption_handler.generate_password_hash(password).decode("utf-8")
+    hashed_password = encryption_handler.generate_password_hash(
+        password).decode("utf-8")
 
     # check if username is already in use
     matching_usernames = User.query.filter_by(username=username).all()
@@ -88,7 +89,9 @@ def login():
     else:
         return custom_response(False, "Account does not exist")
 
-# allow user to send list of required uuids instead of sending whole collection of clothes 
+# allow user to send list of required uuids instead of sending whole collection of clothes
+
+
 @app.route("/api/clothing-variants", methods=["GET", "POST", "PUT"])
 @login_required()
 @admin_required()
@@ -97,24 +100,13 @@ def clothing_items():
 
     if request.method == "GET":
         variants = ClothingVariant.query.all()
-        output = []
-
-        for variant in variants:
-            # get base64 for image
-            if not path.isfile(f'./flask_server/clothing_images/{variant.uuid}.png'):
-                base64_string = ''
-            else:
-                with open(f'./flask_server/clothing_images/{variant.uuid}.png', 'rb') as image_file:
-                    base64_string = base64.b64encode(image_file.read())
-                    image_file.close()
-                
-            output.append({
-                'uuid': variant.uuid,
-                'name': variant.name,
-                'size':  Size.query.filter_by(id=variant.size_id).first().size,
-                'colour': Colour.query.filter_by(id=variant.colour_id).first().colour,
-                'image_data': base64_string
-            })
+        output = [{
+            'uuid': variant.uuid,
+            'name': variant.name,
+            'size':  Size.query.filter_by(id=variant.size_id).first().size,
+            'colour': Colour.query.filter_by(id=variant.colour_id).first().colour,
+            'image_url': f'clothing_images/{variant.uuid}'
+        } for variant in variants]
 
         return custom_response(True, 'Fetched data successfully', data=output)
 
@@ -179,23 +171,14 @@ def user_profile():
     # PUT -> change user's icon colour and clothing item uuid
 
     data = extract_data()
-
     target_user = User.query.filter_by(username=data.get('username')).first()
 
     if request.method == 'GET':
-         # get base64 string for image
-        if not path.isfile(f'./flask_server/clothing_images/{target_user.clothing_id}.png'):
-            base64_string = ''
-        else:
-            with open(f'./flask_server/clothing_images/{target_user.clothing_id}.png', 'rb') as image_file:
-                base64_string = base64.b64encode(image_file.read())
-                image_file.close()
-                
         output = {
             'username': data.get('username'),
             'background_colour': target_user.background_colour,  # hex value
-            'clothing_id': target_user.clothing_id, 
-            'image_data': base64_string
+            'clothing_id': target_user.clothing_id,
+            'image_url': f'clothing_images/{target_user.clothing_id}'
         }
 
         return custom_response(True, 'Got profile data successfully', data=output)
@@ -221,29 +204,16 @@ def user_clothes():
     data = extract_data()
 
     if request.method == 'GET':
-        targetUser = User.query.filter_by(
-            username=data.get('username')).first()
+        targetUser = User.query.filter_by(username=data.get('username')).first()
         owned_clothes = targetUser.owned_clothes
 
-        output = []
-        for item in owned_clothes:
-            item_data = ClothingVariant.query.filter_by(uuid=item.varient_id).first()
-            
-            # get base64 string for image
-            if not path.isfile(f'./flask_server/clothing_images/{item_data.uuid}.png'):
-                base64_string = ''
-            else:
-                with open(f'./flask_server/clothing_images/{item_data.uuid}.png', 'rb') as image_file:
-                    base64_string = base64.b64encode(image_file.read())
-                    image_file.close()
-                    
-            output.append({
-                'uuid': item_data.uuid,
-                'name': item_data.name,
-                'size': Size.query.filter_by(id=item_data.size_id).first().size,
-                'color': Colour.query.filter_by(id=item_data.colour_id).first().colour, 
-                'image_data': base64_string
-            })
+        output = [{
+                    'uuid': item.uuid,
+                    'name': item.name,
+                    'size': Size.query.filter_by(id=item.size_id).first().size,
+                    'color': Colour.query.filter_by(id=item.colour_id).first().colour,
+                    'image_data': f'clothing_images/{item.uuid}'
+        } for item in owned_clothes]
 
         return custom_response(True, 'Fetched data successfully', data=output)
 
@@ -259,7 +229,6 @@ def user_clothes():
 
         if targetItem:
             targetUser.owned_clothes.append(targetItem)
-            # also return information about the item
             db.session.commit()
 
             return custom_response(True, 'Added item to your collections')
@@ -275,40 +244,20 @@ def user_posts():
     # POST -> Publish new post
     # PUT -> delete post
     data = extract_data()
-        
-    target_user = User.query.filter_by(username = data.get('username')).first()
+    target_user = User.query.filter_by(username=data.get('username')).first()
+
 
     if request.method == 'GET':
-        uuids = data.get('uuids')
-        posts = target_user.posts_made
-        output = []
-        
-        if uuids == 'all':
-            uuids = [post.uuid for post in posts]
-        else:
-            if type(uuids) != list:
-                return custom_response(False, 'uuids must have a type of list')
-        
-        for post in posts:
-            if post in uuids:
-                # get base64 string for image
-                if not path.isfile(f'./flask_server/post_images/{post.uuid}.png'):
-                    base64_string = ''
-                else:
-                    with open(f'./flask_server/clothing_images/{post.uuid}.png', 'rb') as image_file:
-                        base64_string = base64.b64encode(image_file.read())
-                        image_file.close()
-                        
-                output.append({
-                            'uuid': post.uuid, 
-                            'date_posted': post.date_posted,
-                            'caption': post.caption, 
-                            'likes': len(post.liked_by), 
-                            'image_data': base64_string
-                            })
-                
-        return custom_response(True, 'Fetched data successfully', data = output)
-                
+        output = [{
+            'id': post.id,
+            'date_posted': post.date_posted,
+            'caption': post.caption,
+            'likes': len(post.liked_by),
+            'image_url': f'/post_images/{post.id}'
+        }]
+
+        return custom_response(True, 'Fetched data successfully', data=output)
+
     elif request.method == 'POST':
         try:
             validation_schemas.PostValidation(**data)
@@ -316,31 +265,29 @@ def user_posts():
             top_error = error.errors()[0]
             error_string = f"{top_error['msg']} for {top_error['loc'][0]}"
             return custom_response(False, error_string)
-        
+
         caption, image_data = data.get('caption'), data.get('image_data')
-        
-        # generate unique id for post 
+
+        # generate unique id for post
         uuid = len(listdir('./flask_server/post_images'))
-        
+
         # add new post to database
-        new_post = Post(caption = caption, uuid = uuid, poster_id = target_user.id)
+        new_post = Post(caption=caption, uuid=uuid, poster_id=target_user.id)
         db.session.add(new_post)
         db.session.commit()
-        
+
         # save image in post_images folder
         clothing_image = base64.b64decode(image_data)
         with open(f'./flask_server/post_images/{uuid}.png', 'wb') as image_file:
             image_file.write(clothing_image)
             image_file.close()
-        
-        
+
         return custom_response(True, 'Post made successfully')
-    
-        
+
     elif request.method == 'PUT':
-        uuid = data.get('uuid')
-        post = Post.query.filter_by(uuid = uuid).first()
-        
+        post_id = data.get('id')
+        post = Post.query.filter_by(id=post_id).first()
+
         # check if post exists
         if post:
             # check if user owns the post it is trying to delete
@@ -352,7 +299,6 @@ def user_posts():
                 return custom_response(False, 'You do not own this post')
         else:
             return custom_response(False, 'Post does not exist')
-        
 
 
 @app.route("/api/posts", methods=["GET"])
@@ -361,19 +307,79 @@ def get_random_posts():
     # GET -> Get random posts for the user
     # POST -> Actions:
     #           Like: add like to post
-    # PUT -> reomove post (admin endpoint)
+    #           Unlike: unlike post 
 
     data = extract_data()
-    
+
     if request.method == 'GET':
-        post_number = data.get('post_number') # number of posts to be fetched
+        post_number = data.get('post_number')  # number of posts to be fetched
         posts = Post.query.all()
+
+        # post_number does not exceed number of posts in the database 
+        if post_number > len(posts):
+            post_number = len(posts)
+
+        random_posts = sample(posts, post_number)
+
+        # add post data
+        output = [{
+            'id': post.id,
+            'date_posted': post.date_posted,
+            'caption': post.caption,
+            'likes': len(post.liked_by),
+            'image_url': f'/post_images/{post.id}'
+        } for post in random_posts]
         
-        # use random.sample to get random posts
-        
+        return custom_response(True, 'Got post data', data=output)
+
+
     elif request.method == 'POST':
-        # add like to post
-        # important to check if user has already liked the post
-        pass
-    elif request.method == 'PUT':
-        pass
+        action = data.get('action')
+        
+        if action == 'LIKE':
+            post_id = data.get('post_id')
+            
+            if type(post_id) != int:
+                return custom_response(False, 'Invalid post_id')
+            
+            target_post = Post.query.filter_by(id = post_id)
+            liker = User.query.filter_by(username = data.get('liker')).first() #user that likes the post 
+            
+            # check if target post exists
+            if not target_post:
+                return custom_response(False, 'Post does not exist')
+            
+            # check if user has already liked the post
+            current_likes = target_post.liked_by 
+            
+            for like in current_likes:
+                if like.user_id == liker.id:
+                    return custom_response(False, 'You have already liked the post')
+            
+            like = Like(user_id = liker.id, post_id = target_post.id)
+            db.session.add(like)
+            db.session.commit()
+            
+            return custom_response(True, 'Liked post successfully')
+        elif action == 'UNLIKE':
+            # implement unlike functionality
+            pass 
+        else:
+            return custom_response(False, 'Invalid action')
+            
+        # implement other features in the future such as sharing and saving 
+
+
+@app.route('/images')
+def get_image():
+    path = request.args.get('path')
+
+    if path:
+        folder = path.split('/')
+
+        if folder[0] == 'clothing_images' or folder[0] == 'post_images' and len(folder) == 2:
+            return send_file(path, mimetype='image/gif')
+        else:
+            return custom_response(False, 'Invalid file path')
+    else:
+        return custom_response(False, 'You must give an image path')
