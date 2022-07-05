@@ -62,8 +62,6 @@ class Post(db.Model):
     __tablename__ = "post"
     # Don't use uuid, because the association table Like, will repeat a long uuid lots of times in memory which is probs not good
     id = db.Column(db.Integer, primary_key=True)
-    # Used for accessing image file
-    uuid = db.Column(db.String(100), nullable=False)
     date_posted = db.Column(db.DateTime, nullable=False, default = datetime.utcnow())
     caption = db.Column(db.String(100), nullable = False)
 
