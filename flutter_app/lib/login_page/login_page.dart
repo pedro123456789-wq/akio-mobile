@@ -12,6 +12,8 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
 
+  static const loginSnackbar = SnackBar(content: Text("Login successful!"));
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,6 +33,7 @@ class _LoginPageState extends State<LoginPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
+                  const SizedBox(height: 50),
                   TextFormField(
                     textAlign: TextAlign.center,
                     autocorrect: false,
@@ -38,14 +41,35 @@ class _LoginPageState extends State<LoginPage> {
                       labelText: "Username",
                     ),
                   ),
-                  const SizedBox(height: 50),
+                  const SizedBox(height: 80),
                   TextFormField(
                     textAlign: TextAlign.center,
                     autocorrect: false,
                     obscureText: true,
                     obscuringCharacter: '*',
                     decoration: const InputDecoration(labelText: "Password"),
-                  )
+                  ),
+                  const SizedBox(height: 80),
+                  ElevatedButton(
+                      onPressed: () {
+                        // Todo: api login
+                        // Todo: update login state
+                        ScaffoldMessenger.of(context)
+                            .showSnackBar(loginSnackbar);
+                      },
+                      child: const Padding(
+                        padding: EdgeInsets.fromLTRB(32, 8, 32, 8),
+                        child: Text("Login",
+                            style: TextStyle(
+                              fontSize: 16,
+                            )),
+                      )),
+                  const SizedBox(height: 80),
+                  TextButton(
+                      onPressed: () {
+                        // Todo: sign up page
+                      },
+                      child: const Text("Sign up..."))
                 ],
               ),
             )));

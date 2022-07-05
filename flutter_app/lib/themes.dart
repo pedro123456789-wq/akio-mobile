@@ -10,6 +10,11 @@ class Themes {
       centerTitle: true,
       color: Colors.black,
     ),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ButtonStyle(
+            foregroundColor: MaterialStateProperty.all(Colors.black),
+            backgroundColor: MaterialStateProperty.all(Colors.white),
+            overlayColor: MaterialStateProperty.all(Colors.grey))),
     inputDecorationTheme: const InputDecorationTheme(
         // Login page input text field border colour
         enabledBorder:
