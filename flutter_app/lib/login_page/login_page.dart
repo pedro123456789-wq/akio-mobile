@@ -1,3 +1,4 @@
+import 'package:akio_mobile/api.dart';
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatefulWidget {
@@ -11,11 +12,19 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
+  final _userController = TextEditingController();
+  final _passController = TextEditingController();
 
-  static const loginSnackbar = SnackBar(content: Text("Login successful!"));
+  @override
+  void dispose() {
+    _userController.dispose();
+    _passController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    const loginSnackbar = SnackBar(content: Text("Login successful!"));
     return Scaffold(
         appBar: AppBar(
           title: Center(
@@ -40,6 +49,7 @@ class _LoginPageState extends State<LoginPage> {
                     decoration: const InputDecoration(
                       labelText: "Username",
                     ),
+                    controller: _userController,
                   ),
                   const SizedBox(height: 80),
                   TextFormField(
@@ -48,12 +58,14 @@ class _LoginPageState extends State<LoginPage> {
                     obscureText: true,
                     obscuringCharacter: '*',
                     decoration: const InputDecoration(labelText: "Password"),
+                    controller: _passController,
                   ),
                   const SizedBox(height: 80),
                   ElevatedButton(
                       onPressed: () {
-                        // Todo: api login
-                        // Todo: update login state
+                        login(_userController.text, _passController.text);
+
+                        // Todo: fix this snackbar not showing
                         ScaffoldMessenger.of(context)
                             .showSnackBar(loginSnackbar);
                       },
