@@ -212,7 +212,7 @@ def user_clothes():
                     'uuid': item.uuid,
                     'name': item.name,
                     'size': Size.query.filter_by(id=item.size_id).first().size,
-                    'color': Colour.query.filter_by(id=item.colour_id).first().colour,
+                    'colour': Colour.query.filter_by(id=item.colour_id).first().colour,
                     'image_data': f'clothing_images/{item.uuid}'
         } for item in owned_clothes]
 
