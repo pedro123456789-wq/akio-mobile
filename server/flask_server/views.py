@@ -18,7 +18,8 @@ from .util import extract_login_data, extract_data
 
 # TODO:
 # Add better validation for scanning endpoint
-# change base64 to image url
+# Create tests
+# Implement unlike functionality
 
 
 @app.route("/api")
