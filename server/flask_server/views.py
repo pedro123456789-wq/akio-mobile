@@ -4,6 +4,7 @@ from pydantic import ValidationError
 from jwt import encode
 from random import choice, sample
 from string import ascii_lowercase, digits
+from uuid import uuid4 as new_uuid
 import base64
 
 from flask import request, send_file
@@ -120,7 +121,9 @@ def clothing_items():
             error_string = f"{top_error['msg']} for {top_error['loc'][0]}"
             return custom_response(False, error_string)
 
-        uuid, name, colour, size, image_data = data.get('uuid'), data.get('name'), data.get('colour'), data.get('size'), data.get('image_data')
+        uuid = new_uuid().hex
+
+        name, colour, size, image_data = data.get('name'), data.get('colour'), data.get('size'), data.get('image_data')
         targetColour = Colour.query.filter_by(colour=colour).first()
         targetSize = Size.query.filter_by(size=size).first()
 
@@ -205,8 +208,8 @@ def user_clothes():
     data = extract_data()
 
     if request.method == 'GET':
-        targetUser = User.query.filter_by(username=data.get('username')).first()
-        owned_clothes = targetUser.owned_clothes
+        target_user = User.query.filter_by(username=data.get('username')).first()
+        owned_clothes = target_user.owned_clothes
 
         output = [{
                     'uuid': item.uuid,
@@ -222,14 +225,14 @@ def user_clothes():
         # allow user to add item to their collection by scanning it
         uuid = data.get('uuid')
 
-        if not uuid or type(uuid) != int:
-            return custom_response(False, 'You did not provide a valid uuid')
+        if not uuid:  # Don't need to make sure it's valid, an invalid uuid just won't return any results.
+            return custom_response(False, 'You did not provide a uuid')
 
-        targetUser = User.query.filter_by(username=data.get('username')).first()
-        targetItem = ClothingVariant.query.filter_by(uuid=uuid).first()
+        target_user = User.query.filter_by(username=data.get('username')).first()
+        target_item = ClothingVariant.query.filter_by(uuid=uuid).first()
 
-        if targetItem:
-            targetUser.owned_clothes.append(targetItem)
+        if target_item:
+            target_user.owned_clothes.append(target_item)
             db.session.commit()
 
             return custom_response(True, 'Added item to your collections')
@@ -255,7 +258,7 @@ def user_posts():
             'caption': post.caption,
             'likes': len(post.liked_by),
             'image_url': f'/post_images/{post.id}'
-        }]
+        } for post in target_user.posts_made]
 
         return custom_response(True, 'Fetched data successfully', data=output)
 
@@ -270,7 +273,7 @@ def user_posts():
         caption, image_data = data.get('caption'), data.get('image_data')
 
         # generate unique id for post
-        uuid = len(listdir('./flask_server/post_images'))
+        uuid = new_uuid().hex
 
         # add new post to database
         new_post = Post(caption=caption, uuid=uuid, poster_id=target_user.id)

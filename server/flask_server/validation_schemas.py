@@ -18,7 +18,6 @@ class SignUp(BaseModel):
 
 class ClothingVariantValidator(BaseModel):
     """/api/clothing-variants => POST"""
-    uuid: int
     name: str
     size: str
     colour: str
