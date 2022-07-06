@@ -23,3 +23,28 @@ void login(String username, String password) async {
     }
   }
 }
+
+
+Future getPosts(int postNumber) async {
+  var postUrl = apiUrl + "/api/posts";
+  
+  try{
+    Dio dio = Dio();
+    dio.options.headers['post_number'] = 10;
+    var response = await dio.get(postUrl);
+
+    print(response.statusCode);
+    print(response.data);
+
+    return response;
+  } on DioError catch (e) {
+    final response = e.response;
+
+    if (response != null){
+      print(response.statusCode);
+      print(response.data);
+    }else{
+      print(e.message);
+    }
+  }
+}
