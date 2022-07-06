@@ -305,7 +305,7 @@ def user_posts():
 
 
 @app.route("/api/posts", methods=["GET"])
-@login_required(methods=["GET"])
+@login_required(methods=["POST"])
 def get_random_posts():
     # GET -> Get random posts for the user
     # POST -> Actions:
@@ -317,6 +317,11 @@ def get_random_posts():
     if request.method == 'GET':
         post_number = data.get('post_number')  # number of posts to be fetched
         posts = Post.query.all()
+        
+        try:
+            post_number = int(post_number)
+        except:
+            return custom_response(False, 'Post number must be an integer')
 
         # post_number does not exceed number of posts in the database 
         if post_number > len(posts):
