@@ -17,9 +17,7 @@ from .util import extract_login_data, extract_data
 
 
 # TODO:
-# Add better validation for scanning endpoint
-# Create tests
-# Implement unlike functionality
+# Create tests for api
 
 
 @app.route("/api")
@@ -90,8 +88,6 @@ def login():
     else:
         return custom_response(False, "Account does not exist")
 
-# allow user to send list of required uuids instead of sending whole collection of clothes
-
 
 @app.route("/api/clothing-variants", methods=["GET", "POST", "PUT"])
 @login_required()
@@ -120,7 +116,8 @@ def clothing_items():
             error_string = f"{top_error['msg']} for {top_error['loc'][0]}"
             return custom_response(False, error_string)
 
-        uuid, name, colour, size, image_data = data.get('uuid'), data.get('name'), data.get('colour'), data.get('size'), data.get('image_data')
+        uuid, name, colour, size, image_data = data.get('uuid'), data.get(
+            'name'), data.get('colour'), data.get('size'), data.get('image_data')
         targetColour = Colour.query.filter_by(colour=colour).first()
         targetSize = Size.query.filter_by(size=size).first()
 
@@ -167,6 +164,7 @@ def clothing_items():
 
 
 @app.route("/api/user/profile", methods=["GET", "POST", "PUT"])
+@login_required()
 def user_profile():
     # GET -> return user's icon colour and clothing item
     # PUT -> change user's icon colour and clothing item uuid
@@ -205,15 +203,16 @@ def user_clothes():
     data = extract_data()
 
     if request.method == 'GET':
-        targetUser = User.query.filter_by(username=data.get('username')).first()
+        targetUser = User.query.filter_by(
+            username=data.get('username')).first()
         owned_clothes = targetUser.owned_clothes
 
         output = [{
-                    'uuid': item.uuid,
-                    'name': item.name,
-                    'size': Size.query.filter_by(id=item.size_id).first().size,
-                    'color': Colour.query.filter_by(id=item.colour_id).first().colour,
-                    'image_data': f'clothing_images/{item.uuid}'
+            'uuid': item.uuid,
+            'name': item.name,
+            'size': Size.query.filter_by(id=item.size_id).first().size,
+            'color': Colour.query.filter_by(id=item.colour_id).first().colour,
+            'image_data': f'clothing_images/{item.uuid}'
         } for item in owned_clothes]
 
         return custom_response(True, 'Fetched data successfully', data=output)
@@ -225,7 +224,8 @@ def user_clothes():
         if not uuid or type(uuid) != int:
             return custom_response(False, 'You did not provide a valid uuid')
 
-        targetUser = User.query.filter_by(username=data.get('username')).first()
+        targetUser = User.query.filter_by(
+            username=data.get('username')).first()
         targetItem = ClothingVariant.query.filter_by(uuid=uuid).first()
 
         if targetItem:
@@ -246,7 +246,6 @@ def user_posts():
     # PUT -> delete post
     data = extract_data()
     target_user = User.query.filter_by(username=data.get('username')).first()
-
 
     if request.method == 'GET':
         output = [{
@@ -302,13 +301,13 @@ def user_posts():
             return custom_response(False, 'Post does not exist')
 
 
-@app.route("/api/posts", methods=["GET"])
-@login_required(methods=["GET"])
+@app.route("/api/posts", methods=["GET", "POST"])
+@login_required(methods=["POST"])
 def get_random_posts():
     # GET -> Get random posts for the user
     # POST -> Actions:
     #           Like: add like to post
-    #           Unlike: unlike post 
+    #           Unlike: unlike post
 
     data = extract_data()
 
@@ -316,7 +315,7 @@ def get_random_posts():
         post_number = data.get('post_number')  # number of posts to be fetched
         posts = Post.query.all()
 
-        # post_number does not exceed number of posts in the database 
+        # post_number does not exceed number of posts in the database
         if post_number > len(posts):
             post_number = len(posts)
 
@@ -330,45 +329,53 @@ def get_random_posts():
             'likes': len(post.liked_by),
             'image_url': f'/post_images/{post.id}'
         } for post in random_posts]
-        
-        return custom_response(True, 'Got post data', data=output)
 
+        return custom_response(True, 'Got post data', data=output)
 
     elif request.method == 'POST':
         action = data.get('action')
-        
+        target_post = Post.query.filter_by(id=post_id)
+
         if action == 'LIKE':
             post_id = data.get('post_id')
-            
+
             if type(post_id) != int:
                 return custom_response(False, 'Invalid post_id')
-            
-            target_post = Post.query.filter_by(id = post_id)
-            liker = User.query.filter_by(username = data.get('liker')).first() #user that likes the post 
-            
+
+            liker = User.query.filter_by(username=data.get(
+                'liker')).first()  # user that likes the post
+
             # check if target post exists
             if not target_post:
                 return custom_response(False, 'Post does not exist')
-            
+
             # check if user has already liked the post
-            current_likes = target_post.liked_by 
-            
+            current_likes = target_post.liked_by
+
             for like in current_likes:
                 if like.user_id == liker.id:
                     return custom_response(False, 'You have already liked the post')
-            
-            like = Like(user_id = liker.id, post_id = target_post.id)
+
+            like = Like(user_id=liker.id, post_id=target_post.id)
             db.session.add(like)
             db.session.commit()
-            
+
             return custom_response(True, 'Liked post successfully')
         elif action == 'UNLIKE':
-            # implement unlike functionality
-            pass 
+            unliker = User.query.filter_by(
+                username=data.get('username')).first()
+            target_like = Like.query.filter_by(
+                user_id=unliker.id, post_id=target_post.id)
+
+            if target_like:
+                db.session.delete(target_like)
+                db.session.commit()
+            else:
+                return custom_response(False, 'You have not liked the post you are trying to unlike')
         else:
             return custom_response(False, 'Invalid action')
-            
-        # implement other features in the future such as sharing and saving 
+
+        # implement other features in the future such as sharing and saving
 
 
 @app.route('/images')
