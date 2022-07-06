@@ -327,11 +327,11 @@ def get_random_posts():
 
         # add post data
         output = [{
-            'id': post.id,
+            'uuid': post.uuid,
             'date_posted': post.date_posted,
             'caption': post.caption,
             'likes': len(post.liked_by),
-            'image_url': f'/post_images/{post.id}'
+            'image_url': f'/post_images/{post.uuid}'
         } for post in random_posts]
         
         return custom_response(True, 'Got post data', data=output)
@@ -341,12 +341,12 @@ def get_random_posts():
         action = data.get('action')
         
         if action == 'LIKE':
-            post_id = data.get('post_id')
+            post_uuid = data.get('uuid')
             
             if type(post_id) != int:
                 return custom_response(False, 'Invalid post_id')
             
-            target_post = Post.query.filter_by(id = post_id)
+            target_post = Post.query.filter_by(uuid = post_uuid)
             liker = User.query.filter_by(username = data.get('liker')).first() #user that likes the post 
             
             # check if target post exists
@@ -360,11 +360,13 @@ def get_random_posts():
                 if like.user_id == liker.id:
                     return custom_response(False, 'You have already liked the post')
             
+            # use id instead of uuid since ids will take up less space than uuids
             like = Like(user_id = liker.id, post_id = target_post.id)
             db.session.add(like)
             db.session.commit()
             
             return custom_response(True, 'Liked post successfully')
+        
         elif action == 'UNLIKE':
             # implement unlike functionality
             pass 
