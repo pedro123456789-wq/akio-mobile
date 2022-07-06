@@ -249,7 +249,7 @@ def user_posts():
 
     if request.method == 'GET':
         output = [{
-            'id': post.id,
+            'uuid': post.uuid,
             'date_posted': post.date_posted,
             'caption': post.caption,
             'likes': len(post.liked_by),
