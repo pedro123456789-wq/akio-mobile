@@ -21,6 +21,7 @@ from .util import extract_login_data, extract_data
 # Add better validation for scanning endpoint
 # Create tests
 # Implement unlike functionality
+# https://flask.palletsprojects.com/en/2.0.x/testing/
 
 
 @app.route("/api")
