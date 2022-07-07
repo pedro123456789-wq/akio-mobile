@@ -106,7 +106,7 @@ def clothing_items():
             'name': variant.name,
             'size':  Size.query.filter_by(id=variant.size_id).first().size,
             'colour': Colour.query.filter_by(id=variant.colour_id).first().colour,
-            'image_url': f'clothing_images/{variant.uuid}'
+            'image_url': f'clothing_images/{variant.uuid}.png'
         } for variant in variants]
 
         return custom_response(True, 'Fetched data successfully', data=output)
@@ -181,7 +181,7 @@ def user_profile():
             'username': data.get('username'),
             'background_colour': target_user.background_colour,  # hex value
             'clothing_id': target_user.clothing_id,
-            'image_url': f'clothing_images/{target_user.clothing_id}'
+            'image_url': f'clothing_images/{target_user.clothing_id}.png'
         }
 
         return custom_response(True, 'Got profile data successfully', data=output)
@@ -256,7 +256,7 @@ def user_posts():
             'date_posted': post.date_posted,
             'caption': post.caption,
             'likes': len(post.liked_by),
-            'image_url': f'/post_images/{post.id}'
+            'image_url': f'post_images/{post.id}.png'
         } for post in target_user.posts_made]
 
         return custom_response(True, 'Fetched data successfully', data=output)
@@ -318,6 +318,8 @@ def get_random_posts():
         post_number = data.get('post_number')  # number of posts to be fetched
         posts = Post.query.all()
         
+        print(post_number)
+        
         try:
             post_number = int(post_number)
         except:
@@ -335,7 +337,7 @@ def get_random_posts():
             'date_posted': post.date_posted,
             'caption': post.caption,
             'likes': len(post.liked_by),
-            'image_url': f'/post_images/{post.uuid}'
+            'image_url': f'post_images/{post.uuid}.png'
         } for post in random_posts]
         
         return custom_response(True, 'Got post data', data=output)
