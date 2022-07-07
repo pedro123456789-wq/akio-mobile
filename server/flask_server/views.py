@@ -48,7 +48,11 @@ def sign_up():
                                 for _ in range(6)])  # pick 6 random letters (a - f) or numbers
 
     items = ClothingVariant.query.all()
-    random_uuid = str(choice(items).uuid)
+    if len(items) > 0:
+        random_uuid = str(choice(items).uuid)
+    else:
+        random_uuid = None
+
     new_user = User(username=username,
                     hashed_password=hashed_password,
                     background_colour=random_hex,
