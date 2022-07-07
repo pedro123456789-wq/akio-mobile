@@ -10,6 +10,21 @@ class PhotoFeedPage extends StatefulWidget {
 }
 
 class _PhotoFeedPageState extends State<PhotoFeedPage> {
+
+  List<Widget> getFeed(response) {
+    List<Widget> children = [];
+
+    for (var item in response) {
+      print(item);
+
+      children.add(
+          Post(imageUrl: '$apiUrl/images?path=${item['image_url']}', likes: item['likes'])
+      );
+    }
+
+    return children;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -17,7 +32,10 @@ class _PhotoFeedPageState extends State<PhotoFeedPage> {
         title: Center(
           child: Text(
             'akio.',
-            style: Theme.of(context).textTheme.headline1,
+            style: Theme
+                .of(context)
+                .textTheme
+                .headline1,
           ),
         ),
       ),
@@ -27,26 +45,18 @@ class _PhotoFeedPageState extends State<PhotoFeedPage> {
           if (snapshot.hasData) {
             return SingleChildScrollView(
               child: Column(
-                children: const [
-                  Post(
-                    imageUrl: "https://picsum.photos/250?image=1",
-                  ),
-                  Post(
-                    imageUrl: "https://picsum.photos/250?image=2",
-                  ),
-                  Post(
-                    imageUrl: "https://picsum.photos/250?image=3",
-                  )
-                ],
+                  children: getFeed(snapshot.data)
               ),
             );
-          }else if (snapshot.hasError){
+          } else if (snapshot.hasError) {
             return Text('${snapshot.error}');
           }
 
-          return const CircularProgressIndicator();
-        }
-      ),
+          return Container(
+            alignment: Alignment.center,
+            child: const CircularProgressIndicator(),
+          );
+        },),
     );
     // shrinkWrap:
   }

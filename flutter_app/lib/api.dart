@@ -29,22 +29,21 @@ Future getPosts(int postNumber) async {
   var postUrl = apiUrl + "/api/posts";
   
   try{
-    Dio dio = Dio();
-    dio.options.headers['post_number'] = 10;
+    Dio dio = Dio(BaseOptions(
+      headers: {
+        'post_number': 10
+      }
+    ));
+
     var response = await dio.get(postUrl);
-
-    print(response.statusCode);
-    print(response.data);
-
-    return response;
+    return response.data['data'];
   } on DioError catch (e) {
     final response = e.response;
 
     if (response != null){
-      print(response.statusCode);
-      print(response.data);
+      return response.data['message'];
     }else{
-      print(e.message);
+      return e.message;
     }
   }
 }

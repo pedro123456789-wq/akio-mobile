@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 
 class Post extends StatefulWidget {
   final String imageUrl;
+  final int likes;
 
   const Post({
     Key? key,
     required this.imageUrl,
+    required this.likes
   }) : super(key: key);
 
   @override
@@ -44,7 +46,7 @@ class _PostState extends State<Post> {
               textDirection: TextDirection.rtl,
               children: [
                 Text(
-                  '100',
+                  widget.likes.toString(),
                   style: Theme.of(context).textTheme.caption,
                 ),
                 ElevatedButton(
