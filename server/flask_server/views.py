@@ -70,7 +70,7 @@ def login():
 
         if encryption_handler.check_password_hash(target_password, password):
             token = encode({"username": username, "exp": datetime.utcnow(
-            ) + timedelta(hours=6)}, app.config["SECRET_KEY"]).decode()
+            ) + timedelta(hours=6)}, app.config["SECRET_KEY"])
             return custom_response(True, "Login Completed", token=str(token))
         else:
             return custom_response(False, "Incorrect password")
