@@ -162,7 +162,7 @@ def clothing_items():
             return custom_response(False, 'No items match given uuid')
 
 
-@app.route("/api/user/profile", methods=["GET", "POST", "PUT"])
+@app.route("/api/user/profile", methods=["GET", "PUT"])
 def user_profile():
     # GET -> return user's icon colour and clothing item
     # PUT -> change user's icon colour and clothing item uuid
