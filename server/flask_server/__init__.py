@@ -6,7 +6,6 @@ from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 from flask_migrate import Migrate
 
-
 SQLALCHEMY_TRACK_MODIFICATIONS = True
 app = Flask(__name__)
 
@@ -32,8 +31,17 @@ encryption_handler = Bcrypt()
 from flask_server import models 
 
 if create_new_db:
+    from .models import User
     print('Creating new database')
     db.create_all()
+    # Create admin account.
+    with app.app_context():
+        admin_account = User(username="admin",
+                            hashed_password=encryption_handler.generate_password_hash(app.config["SECRET_KEY"]).decode("utf-8"),
+                            is_admin=True)
+        db.session.add(admin_account)
+        db.session.commit()
+
 
 
 from flask_server import views 
