@@ -25,11 +25,15 @@ void login(String username, String password) async {
 }
 
 
-Future<String> getPosts(int postNumber) async {
+Future getPosts(int postNumber) async {
   var postUrl = apiUrl + "/api/posts";
-
-  try {
-    Dio dio = Dio(BaseOptions(headers: {'post_number': 10}));
+  
+  try{
+    Dio dio = Dio(BaseOptions(
+      headers: {
+        'post_number': 10
+      }
+    ));
 
     var response = await dio.get(postUrl);
     return response.data['data'];
