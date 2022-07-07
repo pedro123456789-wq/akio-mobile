@@ -21,10 +21,7 @@ class _HomeRoute extends StatelessWidget {
             children: [
               Text(
                 'Collections',
-                style: Theme
-                    .of(context)
-                    .textTheme
-                    .headline1,
+                style: Theme.of(context).textTheme.headline1,
               ),
               ElevatedButton(
                 onPressed: () => _nfcPressed(context),
@@ -73,7 +70,6 @@ class _HomeRoute extends StatelessWidget {
       ),
     );
   }
-
 }
 
 class CollectionsPage extends StatefulWidget {
@@ -104,34 +100,31 @@ class _CollectionsPageState extends State<CollectionsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<AppModel>(
-      builder: (context, value, child) {
-        if (value.loggedIn) {
-          return WillPopScope(
-              child: Navigator(
-                key: innerNavkey,
-                initialRoute: '/',
-                onGenerateRoute: (RouteSettings settings) {
-                  WidgetBuilder builder;
+    var username = Provider.of<AppModel>(context, listen: true).username;
+    print("Rendering...");
+    if (username != null) {
+      return WillPopScope(
+          child: Navigator(
+            key: innerNavkey,
+            initialRoute: '/',
+            onGenerateRoute: (RouteSettings settings) {
+              WidgetBuilder builder;
 
-                  switch (settings.name) {
-                    case '/scan':
-                      builder = (BuildContext context) => const ScanItemPage();
-                      break;
-                    default:
-                      builder = (BuildContext context) => _HomeRoute();
-                      break;
-                  }
+              switch (settings.name) {
+                case '/scan':
+                  builder = (BuildContext context) => const ScanItemPage();
+                  break;
+                default:
+                  builder = (BuildContext context) => _HomeRoute();
+                  break;
+              }
 
-                  return MaterialPageRoute(
-                      builder: builder, settings: settings);
-                },
-              ),
-              onWillPop: () => _canPop(context));
-        } else {
-          return const LoginPage();
-        }
-      },
-    );
+              return MaterialPageRoute(builder: builder, settings: settings);
+            },
+          ),
+          onWillPop: () => _canPop(context));
+    } else {
+      return const LoginPage();
+    }
   }
 }

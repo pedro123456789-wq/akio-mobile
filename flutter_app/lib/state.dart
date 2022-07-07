@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 
 class AppModel extends ChangeNotifier {
-  bool loggedIn = false; // Todo: login system
+  String? _username;
 
-  String? username;
+  String? get username => _username;
+
+  set username(String? username) {
+    _username = username;
+    notifyListeners();
+  } // If null then not logged in
 }
