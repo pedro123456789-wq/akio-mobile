@@ -21,6 +21,9 @@ from .util import extract_login_data, extract_data
 # Create tests
 # https://flask.palletsprojects.com/en/2.0.x/testing/
 
+# We might want to bump this up even further, people don't want to have to login to an app every single time they open it.
+TOKEN_EXPIRATION_HOURS = 24
+
 
 @app.route("/api")
 def home():
@@ -70,7 +73,7 @@ def login():
 
         if encryption_handler.check_password_hash(target_password, password):
             token = encode({"username": username, "exp": datetime.utcnow(
-            ) + timedelta(hours=6)}, app.config["SECRET_KEY"])
+            ) + timedelta(hours=TOKEN_EXPIRATION_HOURS)}, app.config["SECRET_KEY"])
             return custom_response(True, "Login Completed", token=str(token))
         else:
             return custom_response(False, "Incorrect password")
