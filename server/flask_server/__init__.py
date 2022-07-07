@@ -12,7 +12,8 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'test_key' #change in production
 app.config['JSON_SORT_KEYS'] = False
 app.config['ENV'] = 'development'
-app.config['DEBUG'] = True if app.config['ENV'] == 'development' else False 
+app.config['DEBUG'] = True if app.config['ENV'] == 'development' else False
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False  # To suppress the warning. Apparently it is slower to hjave it enabled.
 isDevMode = app.config['ENV'] == 'development'
 
 if isDevMode:
