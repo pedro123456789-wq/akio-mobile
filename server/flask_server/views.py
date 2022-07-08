@@ -339,12 +339,12 @@ def get_random_posts():
 
     elif request.method == 'POST':
         action = data.get('action')
-        
+        post_uuid = data.get('uuid')
+        target_post = Post.query.filter_by(uuid=post_uuid)
+
         if action == 'LIKE':
-            post_uuid = data.get('uuid')
-            
-            target_post = Post.query.filter_by(uuid = post_uuid)
-            liker = User.query.filter_by(username = data.get('liker')).first() #user that likes the post 
+
+            liker = User.query.filter_by(username = data.get('liker')).first() #user that likes the post
             
             # check if target post exists
             if not target_post:
