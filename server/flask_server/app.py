@@ -1,3 +1,4 @@
+from pathlib import Path
 from os.path import isfile
 
 from flask import Flask
@@ -23,7 +24,10 @@ else:
     db_path = 'production.db'
 
 cors = CORS(app, supports_credentials=True)
-create_new_db = not isfile(f'flask_server/{db_path}')
+
+print("Checking path for database: ", end="")
+print(Path(f'{str(Path(__file__).as_posix())}/../flask_server/{db_path}').resolve())
+create_new_db = not isfile(Path(f'{str(Path(__file__).as_posix())}/../{db_path}').resolve())
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 
 db = SQLAlchemy(app)
@@ -45,4 +49,3 @@ if create_new_db:
                              is_admin=True)
         db.session.add(admin_account)
         db.session.commit()
-
