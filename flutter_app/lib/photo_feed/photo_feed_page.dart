@@ -10,15 +10,17 @@ class PhotoFeedPage extends StatefulWidget {
 }
 
 class _PhotoFeedPageState extends State<PhotoFeedPage> {
-
   List<Widget> getFeed(response) {
     List<Widget> children = [];
 
     for (var item in response) {
-      print(item);
-
       children.add(
-          Post(imageUrl: '$apiUrl/images?path=${item['image_url']}', likes: item['likes'])
+        Post(
+          imageUrl: '$apiUrl/images?path=${item['image_url']}',
+          likes: item['likes'],
+          hasLiked: item['has_liked'],
+          uuid: item['uuid']
+        ),
       );
     }
 
@@ -32,21 +34,16 @@ class _PhotoFeedPageState extends State<PhotoFeedPage> {
         title: Center(
           child: Text(
             'akio.',
-            style: Theme
-                .of(context)
-                .textTheme
-                .headline1,
+            style: Theme.of(context).textTheme.headline1,
           ),
         ),
       ),
       body: FutureBuilder(
-        future: getPosts(10),
+        future: getPosts(context, 10),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             return SingleChildScrollView(
-              child: Column(
-                  children: getFeed(snapshot.data)
-              ),
+              child: Column(children: getFeed(snapshot.data)),
             );
           } else if (snapshot.hasError) {
             return Text('${snapshot.error}');
@@ -56,7 +53,8 @@ class _PhotoFeedPageState extends State<PhotoFeedPage> {
             alignment: Alignment.center,
             child: const CircularProgressIndicator(),
           );
-        },),
+        },
+      ),
     );
     // shrinkWrap:
   }

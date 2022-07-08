@@ -1,4 +1,7 @@
 import 'package:dio/dio.dart';
+import 'package:akio_mobile/state.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:provider/provider.dart';
 
 // Android emulator localhost ip
 const apiUrl = "http://10.0.2.2:8080"; // TODO: Set me to production url
@@ -50,26 +53,43 @@ Future<bool> register(String username, String password) async {
   }
 }
 
-
-Future getPosts(int postNumber) async {
+Future getPosts(BuildContext context, int postNumber) async {
   var postUrl = apiUrl + "/api/posts";
-  
-  try{
-    Dio dio = Dio(BaseOptions(
-      headers: {
-        'post_number': 10
-      }
-    ));
+
+  try {
+    Dio dio = Dio(
+      BaseOptions(
+        headers: {
+          'post_number': 10,
+          'username': Provider.of<AppModel>(context, listen: false).username,
+        },
+      ),
+    );
 
     var response = await dio.get(postUrl);
     return response.data['data'];
   } on DioError catch (e) {
-    final response = e.response;
+    handleError(e);
+  }
+}
 
-    if (response != null){
-      return response;
-    }else{
-      return e.message;
-    }
+Future<bool> postAction(BuildContext context, String postUuid, bool isLike) async {
+  var likeUrl = apiUrl + "/api/posts";
+  var username = Provider.of<AppModel>(context, listen: false).username;
+
+  try {
+    var response = await Dio().post(
+      likeUrl,
+      data: {
+        'uuid': postUuid,
+        'action': isLike ? 'LIKE' : 'UNLIKE',
+        'username': username,
+        'token': token
+      },
+    );
+    return response.data['success'];
+  } on DioError catch (e) {
+    handleError(e);
+    return false;
   }
 }
