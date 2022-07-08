@@ -167,13 +167,15 @@ def user_profile():
 
     data = extract_data()
     target_user = User.query.filter_by(username=data.get('username')).first()
+    if target_user is None:
+        return custom_response(False, "User not found")
 
     if request.method == 'GET':
         output = {
             'username': data.get('username'),
             'background_colour': target_user.background_colour,  # hex value
             'clothing_id': target_user.clothing_id,
-            'image_url': f'clothing_images/{target_user.clothing_id}.png'
+            'image_url': f'clothing_images/{target_user.clothing_id}.png' if target_user.clothing_id is not None else None
         }
 
         return custom_response(True, 'Got profile data successfully', data=output)

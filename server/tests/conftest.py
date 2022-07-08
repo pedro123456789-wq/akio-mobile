@@ -25,14 +25,13 @@ def client(app: "Flask"):
             yield testing_client
 
 
-@pytest.fixture
+# Auto-run for every test
+@pytest.fixture(autouse=True)
 def db(app: "Flask"):
     with app.app_context():
-        app_db.session.add(User(
-            username="test",
-            hashed_password=encryption_handler.generate_password_hash("hash").decode()
-        ))
+        app_db.create_all()
 
         yield
 
+        # We don't commit because we don't want the database to save any changes
         app_db.session.close()
