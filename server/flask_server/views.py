@@ -8,8 +8,7 @@ from uuid import uuid4 as new_uuid
 import base64
 
 from flask import request, send_file
-from flask_server import app, db
-from flask_server import encryption_handler
+from flask_server.app import app, db, encryption_handler
 from flask_server import validation_schemas
 from flask_server.authentication import login_required, admin_required
 from flask_server.models import ClothingItem, ClothingVariant, User, Colour, Size, Post, Like

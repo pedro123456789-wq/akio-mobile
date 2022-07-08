@@ -1,4 +1,4 @@
-from flask_server import db
+from flask_server.app import db
 from datetime import datetime
 
 # TODO: FINISH ME

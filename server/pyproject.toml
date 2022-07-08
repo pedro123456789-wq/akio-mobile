@@ -2,7 +2,7 @@
 name = "flask_server"
 version = "0.1.0"
 description = "Server for akio mobile app"
-authors = ["."]
+authors = ["Taran McVay", "Pedro Lourenco"]
 
 [tool.poetry.dependencies]
 python = "^3.7"
@@ -16,6 +16,7 @@ PyJWT = "^2.4.0"
 
 [tool.poetry.dev-dependencies]
 autopep8 = "^1.6.0"
+pytest = "^7.1.2"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
