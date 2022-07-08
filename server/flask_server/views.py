@@ -76,8 +76,7 @@ def login():
         target_password = target_user.hashed_password
 
         if encryption_handler.check_password_hash(target_password, password):
-            token = encode({"username": username, "exp": datetime.utcnow(
-            ) + timedelta(hours=TOKEN_EXPIRATION_HOURS)}, app.config["SECRET_KEY"])
+            token = encode({"username": username, "exp": datetime.utcnow() + timedelta(hours=TOKEN_EXPIRATION_HOURS)}, app.config["SECRET_KEY"]).decode()
             return custom_response(True, "Login Completed", token=str(token))
         else:
             return custom_response(False, "Incorrect password")
@@ -298,7 +297,7 @@ def user_posts():
             return custom_response(False, 'Post does not exist')
 
 
-@app.route("/api/posts", methods=["GET"])
+@app.route("/api/posts", methods=["GET", "POST"])
 @login_required(methods=["POST"])
 def get_random_posts():
     # GET -> Get random posts for the user
@@ -310,9 +309,12 @@ def get_random_posts():
 
     if request.method == 'GET':
         post_number = data.get('post_number')  # number of posts to be fetched
-        posts = Post.query.all()
+        # must recieve username of user to check if they have already liked the post and determine the colour of the like button
+        # if user is not logged in username will be None, since users that are not logged in cannot like posts so the username
+        # does not matter
         
-        print(post_number)
+        username = data.get('username') 
+        posts = Post.query.all()
         
         try:
             post_number = int(post_number)
@@ -322,7 +324,7 @@ def get_random_posts():
         # post_number does not exceed number of posts in the database 
         if post_number > len(posts):
             post_number = len(posts)
-
+            
         random_posts = sample(posts, post_number)
 
         # add post data
@@ -331,7 +333,9 @@ def get_random_posts():
             'date_posted': post.date_posted,
             'caption': post.caption,
             'likes': len(post.liked_by),
-            'image_url': f'post_images/{post.uuid}.png'
+            'image_url': f'post_images/{post.uuid}.png', 
+            # check if user has already liked the post 
+            'has_liked': username in [User.query.filter_by(id = liker.user_id).first().username for liker in post.liked_by] 
         } for post in random_posts]
         
         return custom_response(True, 'Got post data', data=output)
@@ -340,11 +344,10 @@ def get_random_posts():
     elif request.method == 'POST':
         action = data.get('action')
         post_uuid = data.get('uuid')
-        target_post = Post.query.filter_by(uuid=post_uuid)
-
+        target_post = Post.query.filter_by(uuid=post_uuid).first()
+        
         if action == 'LIKE':
-
-            liker = User.query.filter_by(username = data.get('liker')).first() #user that likes the post
+            liker = User.query.filter_by(username = data.get('username')).first() #user that likes the post
             
             # check if target post exists
             if not target_post:
@@ -365,14 +368,14 @@ def get_random_posts():
             return custom_response(True, 'Liked post successfully')
         
         elif action == 'UNLIKE':
-            unliker = User.query.filter_by(
-                username=data.get('username')).first()
-            target_like = Like.query.filter_by(
-                user_id=unliker.id, post_id=target_post.id)
+            unliker = User.query.filter_by(username=data.get('username')).first()
+            target_like = Like.query.filter_by(user_id=unliker.id, post_id=target_post.id).first()
 
             if target_like:
                 db.session.delete(target_like)
                 db.session.commit()
+                
+                return custom_response(True, 'Unliked successfully')
             else:
                 return custom_response(False, 'You have not liked the post you are trying to unlike')
         else:
