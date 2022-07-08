@@ -33,5 +33,5 @@ def db(app: "Flask"):
 
         yield
 
-        # We don't commit because we don't want the database to save any changes
-        app_db.session.close()
+        # Drop all changes (rolling back or closing does not work because the routes will call commit)
+        app_db.drop_all()

@@ -27,12 +27,12 @@ class ClothingVariantValidator(BaseModel):
 class ProfileData(BaseModel):
     """api/user/profile"""
     background_colour: str
-    clothing_uuid: int
+    clothing_id: str
 
-    @validator('clothing_uuid')
+    @validator('clothing_id')
     def is_valid(cls, v):
         items = ClothingVariant.query.all()
-        uuids = [int(item.uuid) for item in items]
+        uuids = [str(item.uuid) for item in items]
 
         if v not in uuids:
             raise ValueError('Invalid uuid entered')

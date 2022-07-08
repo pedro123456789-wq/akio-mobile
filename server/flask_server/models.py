@@ -42,6 +42,9 @@ class ClothingVariant(db.Model):
     size_id = db.Column(db.Integer, db.ForeignKey("size.id"), nullable=False)
     colour_id = db.Column(db.Integer, db.ForeignKey("colour.id"), nullable=False)
 
+    size = db.relationship("Size")
+    colour = db.relationship("Colour")
+
     # one to many relationship with ClothingItem(junction table) to form many-to-many relationship with User
     owners = db.relationship("ClothingItem", backref="variant")
 

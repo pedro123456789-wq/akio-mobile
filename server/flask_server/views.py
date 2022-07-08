@@ -186,10 +186,10 @@ def user_profile():
         except ValidationError as error:
             top_error = error.errors()[0]
             error_string = f"{top_error['msg']} for {top_error['loc'][0]}"
-            return custom_response(False, error_string)
+            return custom_response(False, error_string, code=400)
 
         target_user.background_colour = data.get('background_colour')
-        target_user.clothing_id = data.get('clothing_uuid')
+        target_user.clothing_id = data.get('clothing_id')
         db.session.commit()
 
         return custom_response(True, 'Updated profile successfully')
