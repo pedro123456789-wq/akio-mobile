@@ -2,6 +2,10 @@ import 'package:akio_mobile/api.dart';
 import 'package:akio_mobile/device_info.dart';
 import 'package:flutter/material.dart';
 
+
+//TODO: If user is not logged in and tries to like redirect them to the collections page to log in
+
+
 class Post extends StatefulWidget {
   final String imageUrl;
   final int likes;
