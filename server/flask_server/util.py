@@ -24,8 +24,8 @@ def extract_data():
     if request.method in ["POST", "PUT", "DELETE"]:
         data = request.get_json()
     elif request.method == 'GET':
-        
-        data = request.headers
-        data = {k.lower().replace('-', '_'): v for k, v in data.items()}
+        data = request.args
+    else:
+        raise Exception("Invalid HTTP method passed to extract data!")
 
     return data
