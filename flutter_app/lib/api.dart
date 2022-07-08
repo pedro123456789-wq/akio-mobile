@@ -41,7 +41,7 @@ Future getPosts(int postNumber) async {
     final response = e.response;
 
     if (response != null){
-      return response.data['message'];
+      return response;
     }else{
       return e.message;
     }
