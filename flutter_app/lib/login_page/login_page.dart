@@ -41,7 +41,7 @@ class _LoginPageState extends State<LoginPage> {
           backgroundColor: Colors.black,
         ),
         body: Form(
-          // Probably isn't necessary to use a form here
+            // Probably isn't necessary to use a form here
             key: _formKey,
             child: Padding(
               padding: const EdgeInsets.fromLTRB(60, 50, 60, 0),
@@ -68,79 +68,78 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   const SizedBox(height: 80),
                   ElevatedButton(
-                      onPressed: () async {
-                        bool success = await login(
-                            _userController.text, _passController.text);
+                    onPressed: () async {
+                      bool success = await login(
+                          _userController.text, _passController.text);
 
-                        if (success) {
-                          print("Updating provider.");
-                          Provider.of<AppModel>(context, listen: false)
-                              .username = _userController.text;
-                        } else {
-                          Provider.of<AppModel>(context, listen: false)
-                              .username = null;
-                        }
-                        // Todo: fix this snackbar not showing
-                        ScaffoldMessenger.of(context)
-                            .showSnackBar(loginSnackbar);
-                      },
-                      child: const Padding(
-                        padding: EdgeInsets.fromLTRB(32, 8, 32, 8),
-                        child: Text("Login",
-                            style: TextStyle(
-                              fontSize: 16,
-                            )),
-                      )),
-                  const SizedBox(height: 80),
+                      if (success) {
+                        print("Updating provider.");
+                        Provider.of<AppModel>(context, listen: false).username =
+                            _userController.text;
+                      } else {
+                        Provider.of<AppModel>(context, listen: false).username =
+                            null;
+                      }
+                      // Todo: fix this snackbar not showing
+                      ScaffoldMessenger.of(context).showSnackBar(loginSnackbar);
+                    },
+                    child: const Padding(
+                      padding: EdgeInsets.fromLTRB(32, 8, 32, 8),
+                      child: Text(
+                        "Login",
+                        style: TextStyle(
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 40),
                   TextButton(
                       onPressed: () {
                         _usernameTaken = false;
                         showDialog(
-                            context: context,
-                            builder: (BuildContext context) => AlertDialog(
-                                  title: const Text("Register for akio."),
-                                  content: Column(
-                                    children: [
-                                      const Text(
-                                          "Please confirm your password."),
-                                      TextField(
-                                        controller: _confirmPassController,
-                                        textAlign: TextAlign.center,
-                                        autocorrect: false,
-                                        obscureText: true,
-                                        obscuringCharacter: '*',
-                                        decoration: const InputDecoration(
-                                            labelText: "Password"),
-                                      ),
-                                      Text(_usernameTaken
-                                          ? "Username taken"
-                                          : ""),
-                                    ],
-                                  ),
-                                  actions: [
-                                    TextButton(
-                                        onPressed: () =>
-                                            Navigator.of(context).pop(),
-                                        child: const Text("Cancel")),
-                                    TextButton(
-                                        onPressed: () async {
-                                          bool passwordsMatch =
-                                              (_passController.text ==
-                                                  _confirmPassController.text);
-                                          if (passwordsMatch) {
-                                            var result = await register(
-                                                _userController.text,
-                                                _passController.text);
-                                            if (result) {
-                                              Navigator.of(context).pop();
-                                            } else {
-                                              _usernameTaken = true;
-                                            }
-                                          }
-                                        },
-                                        child: const Text("Confirm")),
-                                  ],
-                                ));
+                          context: context,
+                          builder: (BuildContext context) => AlertDialog(
+                            title: const Text("Register for akio."),
+                            content: Column(
+                              children: [
+                                const Text("Please confirm your password."),
+                                TextField(
+                                  controller: _confirmPassController,
+                                  textAlign: TextAlign.center,
+                                  autocorrect: false,
+                                  obscureText: true,
+                                  obscuringCharacter: '*',
+                                  decoration: const InputDecoration(
+                                      labelText: "Password"),
+                                ),
+                                Text(_usernameTaken ? "Username taken" : ""),
+                              ],
+                            ),
+                            actions: [
+                              TextButton(
+                                  onPressed: () => Navigator.of(context).pop(),
+                                  child: const Text("Cancel")),
+                              TextButton(
+                                  onPressed: () async {
+                                    bool passwordsMatch =
+                                        (_passController.text ==
+                                            _confirmPassController.text);
+                                    if (passwordsMatch) {
+                                      var result = await register(
+                                          _userController.text,
+                                          _passController.text);
+                                      if (result) {
+                                        Navigator.of(context).pop();
+                                      } else {
+                                        _usernameTaken = true;
+                                      }
+                                    }
+                                  },
+                                  child: const Text("Confirm")),
+                            ],
+                          ),
+                        );
                       },
                       child: const Text("Sign up..."))
                 ],
