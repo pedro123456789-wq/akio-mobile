@@ -6,6 +6,7 @@ from random import choice, sample
 from string import ascii_lowercase, digits
 from uuid import uuid4 as new_uuid
 import base64
+from sqlalchemy import select
 
 from flask import request, send_file
 from flask_server.app import app, db, encryption_handler
@@ -336,7 +337,7 @@ def get_random_posts():
             'likes': len(post.liked_by),
             'image_url': f'post_images/{post.uuid}.png', 
             # check if user has already liked the post 
-            'has_liked': username in [User.query.filter_by(id = liker.user_id).first().username for liker in post.liked_by] 
+            'has_liked': db.session.query(User, Like).filter(Like.post_id == post.id).filter(User.id == Like.user_id).filter(User.username == username).first() is not None
         } for post in random_posts]
         
         return custom_response(True, 'Got post data', data=output)
