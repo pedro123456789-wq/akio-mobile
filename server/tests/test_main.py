@@ -20,14 +20,12 @@ def make_test_user():
     return new_user
 
 
-def make_test_clothing():
-    new_size = Size(size="Medium")
-    new_colour = Colour(colour="Blue")
+def make_test_clothing_variant():
     new_clothing = ClothingVariant(
         uuid="1114cfe8e05a4f89b77f371816b28553",
         name="A test hoodie",
-        size=new_size,
-        colour=new_colour
+        size=(Size(size="Medium")),
+        colour=(Colour(colour="Blue"))
     )
 
     app_db.session.add(new_clothing)
@@ -48,7 +46,7 @@ def test_profile(client: "FlaskClient"):
     assert bad_response.status_code == 404
     assert bad_response.json.get('message') == "User not found"
 
-    new_clothing = make_test_clothing()
+    new_clothing = make_test_clothing_variant()
     put_response = client.put('/api/user/profile',
                               json={"background_colour": "#123456", "clothing_id": new_clothing.uuid,
                                     "username": new_user.username})
@@ -70,6 +68,9 @@ def test_profile(client: "FlaskClient"):
     assert bad_uuid.status_code == 400
     assert bad_uuid.json.get('message') == "Invalid uuid entered for clothing_id"
 
+
+def test_clothing_items():
+    pass
 
 def test_home(client: "FlaskClient"):
     # Test to make sure that database changes are not being rolled over between tests
