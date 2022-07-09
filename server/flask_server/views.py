@@ -314,7 +314,7 @@ def get_random_posts():
         # must recieve username of user to check if they have already liked the post and determine the colour of the like button
         # if user is not logged in username will be None, since users that are not logged in cannot like posts so the username
         # does not matter
-        
+        print(post_number)
         username = data.get('username') 
         posts = Post.query.all()
         
@@ -336,6 +336,7 @@ def get_random_posts():
             'caption': post.caption,
             'likes': len(post.liked_by),
             'image_url': f'post_images/{post.uuid}.png', 
+            'poster': User.query.filter_by(id = post.post_id).first().username, 
             # check if user has already liked the post 
             'has_liked': db.session.query(User, Like).filter(Like.post_id == post.id).filter(User.id == Like.user_id).filter(User.username == username).first() is not None
         } for post in random_posts]
