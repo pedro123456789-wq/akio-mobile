@@ -59,7 +59,7 @@ Future getPosts(BuildContext context, int postNumber) async {
   try {
     Dio dio = Dio(
       BaseOptions(
-        headers: {
+        queryParameters: {
           'post_number': 10,
           'username': Provider.of<AppModel>(context, listen: false).username,
         },
