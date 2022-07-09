@@ -6,6 +6,7 @@ if TYPE_CHECKING:
 
 from flask_server.app import db as app_db, encryption_handler
 from flask_server.models import User, ClothingVariant, Size, Colour
+from pathlib import Path
 
 
 # Aim for 100% code coverage
@@ -27,6 +28,10 @@ def make_test_clothing_variant():
         size=(Size(size="Medium")),
         colour=(Colour(colour="Blue"))
     )
+
+    with open(Path(f"../flask_server/clothing_images/test.png").resolve(), "rb") as original_file:
+        with open(Path(f"../flask_server/clothing_images/{new_clothing.uuid}").resolve(), "wb") as new_file:
+            new_file.write(original_file.read())
 
     app_db.session.add(new_clothing)
     return new_clothing
@@ -70,7 +75,9 @@ def test_profile(client: "FlaskClient"):
 
 
 def test_clothing_items():
-    pass
+    user = make_test_user()
+    variant = make_test_clothing_variant()
+
 
 def test_home(client: "FlaskClient"):
     # Test to make sure that database changes are not being rolled over between tests
