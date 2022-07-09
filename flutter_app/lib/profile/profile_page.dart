@@ -1,5 +1,8 @@
 import 'package:akio_mobile/device_info.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../state.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -38,6 +41,8 @@ class _ProfilePageState extends State<ProfilePage>
 
   @override
   Widget build(BuildContext context) {
+    var username = Provider.of<AppModel>(context, listen: false).username;
+
     return Column(
       children: [
         Container(
@@ -71,9 +76,9 @@ class _ProfilePageState extends State<ProfilePage>
                     Container(
                       padding: EdgeInsets.all(
                           DeviceInfo.deviceWidth(context) * 0.15),
-                      child: const Text(
-                        'Name',
-                        style: TextStyle(
+                      child: Text(
+                        username!,
+                        style: const TextStyle(
                             color: Colors.black,
                             fontSize: 25.0,
                             fontFamily: 'LibreBodoni'),
