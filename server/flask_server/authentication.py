@@ -3,7 +3,7 @@ import jwt
 from datetime import datetime
 from pydantic import ValidationError
 
-from flask_server import app
+from flask_server.app import app
 from flask_server.responses import custom_response
 from flask_server.validation_schemas import SessionValidation
 from flask_server.models import User
@@ -35,6 +35,8 @@ def login_required(methods=None):
 
 
                 username, token = data.get("username"), data.get("token")
+                
+                print(token)
 
                 # check if token is valid and has not expired
                 try:
@@ -45,7 +47,8 @@ def login_required(methods=None):
                         return custom_response(False, "Token does not match username")
                     elif datetime.fromtimestamp(token_expiration) < datetime.now():
                         return custom_response(False, "Token has expired")
-                except Exception:
+                except Exception as e:
+                    print(e)
                     return custom_response(False, "Invalid token")
 
             return function(*args, **kwargs)
