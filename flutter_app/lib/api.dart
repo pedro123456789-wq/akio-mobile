@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:akio_mobile/state.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 // Android emulator localhost ip
@@ -15,6 +16,7 @@ void handleError(DioError e) {
     print("ERROR IN REQUEST: ");
     print(response.statusCode);
     print(response.data);
+    return response.data['message'];
   } else {
     print("Assume some sort of network error.");
     // print(e.requestOptions);
@@ -73,7 +75,8 @@ Future getPosts(BuildContext context, int postNumber) async {
   }
 }
 
-Future<bool> postAction(BuildContext context, String postUuid, bool isLike) async {
+Future<bool> postAction(
+    BuildContext context, String postUuid, bool isLike) async {
   var likeUrl = apiUrl + "/api/posts";
   var username = Provider.of<AppModel>(context, listen: false).username;
 
@@ -87,6 +90,27 @@ Future<bool> postAction(BuildContext context, String postUuid, bool isLike) asyn
         'token': token
       },
     );
+    return response.data['success'];
+  } on DioError catch (e) {
+    handleError(e);
+    return false;
+  }
+}
+
+Future<bool> createPost(String username, String imageData, String caption) async {
+  var postUrl = apiUrl + "/api/user/posts";
+
+  try {
+    var response = await Dio().post(
+      postUrl,
+      data: {
+        'username': username,
+        'token': token,
+        'image_data': imageData,
+        'caption': caption
+      },
+    );
+
     return response.data['success'];
   } on DioError catch (e) {
     handleError(e);
