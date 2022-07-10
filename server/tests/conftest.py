@@ -4,8 +4,25 @@ if TYPE_CHECKING:
 
 from flask_server.app import app as flask_app, db as app_db, encryption_handler
 from flask_server.models import User
+from pathlib import Path
 
 import pytest
+
+
+IMAGE_FILE_PARENT_DIRECTORY = Path(f"{__file__}/../../flask_server").resolve()
+
+
+def clear_images():
+    clothing_images = IMAGE_FILE_PARENT_DIRECTORY.joinpath(Path("./clothing_images")).resolve()
+    post_images = IMAGE_FILE_PARENT_DIRECTORY.joinpath(Path("./post_images")).resolve()
+
+    for file in clothing_images.iterdir():
+        if file.name != "test.png":
+            file.unlink()
+
+    for file in post_images.iterdir():
+        if file.name != "test.png":
+            file.unlink()
 
 
 @pytest.fixture()
@@ -34,4 +51,5 @@ def db(app: "Flask"):
         yield
 
         # Drop all changes (rolling back or closing does not work because the routes will call commit)
+        clear_images()
         app_db.drop_all()

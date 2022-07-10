@@ -1,12 +1,14 @@
-import json
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from flask.testing import FlaskClient
 
 from flask_server.app import db as app_db, encryption_handler
-from flask_server.models import User, ClothingVariant, Size, Colour
+from flask_server.models import User, ClothingVariant, Size, Colour, ClothingItem
+from pathlib import Path
+from uuid import uuid4 as uuid
 
+from conftest import IMAGE_FILE_PARENT_DIRECTORY
 
 # Aim for 100% code coverage
 
@@ -20,18 +22,31 @@ def make_test_user():
     return new_user
 
 
-def make_test_clothing():
-    new_size = Size(size="Medium")
-    new_colour = Colour(colour="Blue")
+def make_test_clothing_variant():
     new_clothing = ClothingVariant(
-        uuid="1114cfe8e05a4f89b77f371816b28553",
+        uuid=uuid().hex,
         name="A test hoodie",
-        size=new_size,
-        colour=new_colour
+        size=(Size(size="Medium")),
+        colour=(Colour(colour="Blue"))
     )
+
+    with open(IMAGE_FILE_PARENT_DIRECTORY.joinpath(Path(f"./clothing_images/test.png")).resolve(), "rb") as original_file:
+        with open(IMAGE_FILE_PARENT_DIRECTORY.joinpath(Path(f"./clothing_images/{new_clothing.uuid}")).resolve(), "wb") as new_file:
+            new_file.write(original_file.read())
 
     app_db.session.add(new_clothing)
     return new_clothing
+
+
+def make_test_clothing_item(variant: ClothingVariant, user=None):
+    clothing_item = ClothingItem(
+        variant=variant,
+        uuid=uuid().hex,
+        user=user
+    )
+
+    app_db.session.add(clothing_item)
+    return clothing_item
 
 
 def test_profile(client: "FlaskClient"):
@@ -48,7 +63,7 @@ def test_profile(client: "FlaskClient"):
     assert bad_response.status_code == 404
     assert bad_response.json.get('message') == "User not found"
 
-    new_clothing = make_test_clothing()
+    new_clothing = make_test_clothing_variant()
     put_response = client.put('/api/user/profile',
                               json={"background_colour": "#123456", "clothing_id": new_clothing.uuid,
                                     "username": new_user.username})
@@ -69,6 +84,12 @@ def test_profile(client: "FlaskClient"):
                                 "username": new_user.username})
     assert bad_uuid.status_code == 400
     assert bad_uuid.json.get('message') == "Invalid uuid entered for clothing_id"
+
+
+def test_clothing_items():
+    user = make_test_user()
+    variant = make_test_clothing_variant()
+    item = make_test_clothing_item(variant, user)
 
 
 def test_home(client: "FlaskClient"):
