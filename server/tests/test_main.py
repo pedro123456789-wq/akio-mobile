@@ -8,6 +8,7 @@ from flask_server.models import User, ClothingVariant, Size, Colour, ClothingIte
 from pathlib import Path
 from uuid import uuid4 as uuid
 
+from conftest import IMAGE_FILE_PARENT_DIRECTORY
 
 # Aim for 100% code coverage
 
@@ -29,8 +30,8 @@ def make_test_clothing_variant():
         colour=(Colour(colour="Blue"))
     )
 
-    with open(Path(f"../flask_server/clothing_images/test.png").resolve(), "rb") as original_file:
-        with open(Path(f"../flask_server/clothing_images/{new_clothing.uuid}").resolve(), "wb") as new_file:
+    with open(IMAGE_FILE_PARENT_DIRECTORY.joinpath(Path(f"./clothing_images/test.png")).resolve(), "rb") as original_file:
+        with open(IMAGE_FILE_PARENT_DIRECTORY.joinpath(Path(f"./clothing_images/{new_clothing.uuid}")).resolve(), "wb") as new_file:
             new_file.write(original_file.read())
 
     app_db.session.add(new_clothing)

@@ -9,9 +9,12 @@ from pathlib import Path
 import pytest
 
 
+IMAGE_FILE_PARENT_DIRECTORY = Path(f"{__file__}/../../flask_server").resolve()
+
+
 def clear_images():
-    clothing_images = Path("../flask_server/clothing_images").resolve()
-    post_images = Path("../flask_server/post_images").resolve()
+    clothing_images = IMAGE_FILE_PARENT_DIRECTORY.joinpath(Path("./clothing_images")).resolve()
+    post_images = IMAGE_FILE_PARENT_DIRECTORY.joinpath(Path("./post_images")).resolve()
 
     for file in clothing_images.iterdir():
         if file.name != "test.png":
