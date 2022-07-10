@@ -6,20 +6,21 @@ import 'package:provider/provider.dart';
 
 import '../state.dart';
 
-//TODO: show username of user that posted
 
 class Post extends StatefulWidget {
   final String imageUrl;
   final int likes;
   final bool hasLiked;
   final String uuid;
+  final String poster;
 
   const Post(
       {Key? key,
       required this.imageUrl,
       required this.likes,
       required this.hasLiked,
-      required this.uuid})
+      required this.uuid,
+      required this.poster})
       : super(key: key);
 
   @override
@@ -136,13 +137,17 @@ class _PostState extends State<Post> {
             child: Container(
               margin: const EdgeInsets.only(left: 10),
               child: Text(
-                'Poster',
+                widget.poster,
                 style: Theme.of(context).textTheme.bodySmall,
               ),
             ),
           ),
-          Image.network(
-            widget.imageUrl,
+          Container(
+            width: DeviceInfo.deviceWidth(context) * 0.9,
+            height: DeviceInfo.deviceHeight(context) * 0.45,
+            child: Image.network(
+              widget.imageUrl,
+            ),
           ),
           Container(
             margin: EdgeInsets.only(
