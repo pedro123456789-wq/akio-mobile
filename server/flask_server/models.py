@@ -9,6 +9,7 @@ from datetime import datetime
 # Images will refer to the name of the image, assigned via uuid, in the filesystem
 # Using String(100) since i doubt usernames, sizes, passwords, etc will ever exceed 100 characters, and postgresql requires a length to be provided with String
 
+
 class User(db.Model):
     __tablename__ = "user"
     id = db.Column(db.Integer, primary_key=True)
@@ -81,5 +82,7 @@ class Like(db.Model):
 
 class ClothingItem(db.Model):
     __tablename__ = "clothing_item"
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), primary_key=True)
     variant_id = db.Column(db.String(100), db.ForeignKey("clothing_variant.uuid"), primary_key=True)
+
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    uuid = db.Column(db.String(100), nullable=False)

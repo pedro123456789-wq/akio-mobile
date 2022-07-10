@@ -1,12 +1,12 @@
-import json
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from flask.testing import FlaskClient
 
 from flask_server.app import db as app_db, encryption_handler
-from flask_server.models import User, ClothingVariant, Size, Colour
+from flask_server.models import User, ClothingVariant, Size, Colour, ClothingItem
 from pathlib import Path
+from uuid import uuid4 as uuid
 
 
 # Aim for 100% code coverage
@@ -23,7 +23,7 @@ def make_test_user():
 
 def make_test_clothing_variant():
     new_clothing = ClothingVariant(
-        uuid="1114cfe8e05a4f89b77f371816b28553",
+        uuid=uuid().hex,
         name="A test hoodie",
         size=(Size(size="Medium")),
         colour=(Colour(colour="Blue"))
@@ -35,6 +35,17 @@ def make_test_clothing_variant():
 
     app_db.session.add(new_clothing)
     return new_clothing
+
+
+def make_test_clothing_item(variant: ClothingVariant, user=None):
+    clothing_item = ClothingItem(
+        variant=variant,
+        uuid=uuid().hex,
+        user=user
+    )
+
+    app_db.session.add(clothing_item)
+    return clothing_item
 
 
 def test_profile(client: "FlaskClient"):
@@ -77,6 +88,7 @@ def test_profile(client: "FlaskClient"):
 def test_clothing_items():
     user = make_test_user()
     variant = make_test_clothing_variant()
+    item = make_test_clothing_item(variant, user)
 
 
 def test_home(client: "FlaskClient"):
