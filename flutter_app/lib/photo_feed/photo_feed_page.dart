@@ -5,6 +5,7 @@ import 'package:akio_mobile/api.dart';
 import 'package:provider/provider.dart';
 
 import '../state.dart';
+import 'create_post_dialog.dart';
 
 class PhotoFeedPage extends StatefulWidget {
   const PhotoFeedPage({Key? key}) : super(key: key);
@@ -18,59 +19,36 @@ class _PhotoFeedPageState extends State<PhotoFeedPage> {
     List<Widget> children = [];
 
     for (var item in response) {
+      print(item);
+
       children.add(
         Post(
-            imageUrl: '$apiUrl/images?path=${item['image_url']}',
-            likes: item['likes'],
-            hasLiked: item['has_liked'],
-            uuid: item['uuid']),
+          imageUrl: '$apiUrl/images?path=${item['image_url']}',
+          likes: item['likes'],
+          hasLiked: item['has_liked'],
+          uuid: item['uuid'],
+          poster: item['poster'],
+        ),
       );
     }
 
     return children;
   }
 
-  Future<dynamic> postDialog(BuildContext context) {
-    return showDialog(
-      context: context,
-      builder: (BuildContext context) => AlertDialog(
-        backgroundColor: Colors.black,
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'Create Post',
-              style: Theme.of(context).textTheme.headline1,
-            ),
-            ElevatedButton(
-              onPressed: () => Navigator.pop(context, true),
-              child: const Icon(Icons.exit_to_app),
-            )
-          ],
-        ),
-        content: Container(
-          width: DeviceInfo.deviceWidth(context) * 0.9,
-          child: Column(
-            children: const [
-              Text(
-                'Add your image',
-              )
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget getPostButton(BuildContext context) {
-    var username = Provider.of<AppModel>(context, listen: false).username;
-
+  Widget getPostButton(BuildContext context, String? username) {
     //only show post button if user is logged in
     if (username != null) {
       return Container(
         margin: EdgeInsets.only(top: DeviceInfo.deviceHeight(context) * 0.01),
         child: ElevatedButton(
-          onPressed: () => postDialog(context),
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return CreatePostDialog(username: username);
+              },
+            );
+          },
           child: const Icon(Icons.add),
         ),
       );
@@ -81,6 +59,8 @@ class _PhotoFeedPageState extends State<PhotoFeedPage> {
 
   @override
   Widget build(BuildContext context) {
+    String? username = Provider.of<AppModel>(context, listen: false).username;
+
     return Scaffold(
       appBar: AppBar(
         title: Center(
@@ -102,7 +82,7 @@ class _PhotoFeedPageState extends State<PhotoFeedPage> {
                     child: Column(children: getFeed(snapshot.data)),
                   ),
                 ),
-                getPostButton(context)
+                getPostButton(context, username)
               ],
             );
           } else if (snapshot.hasError) {
