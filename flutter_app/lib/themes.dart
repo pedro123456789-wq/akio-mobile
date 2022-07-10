@@ -36,7 +36,7 @@ class Themes {
         fontFamily: 'LibreBodoni',
       ),
       headline2: TextStyle(
-        fontSize: 36.0,
+        fontSize: 27.0,
         fontFamily: 'LibreBodoni',
       ),
       caption: TextStyle(
