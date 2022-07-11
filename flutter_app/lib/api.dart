@@ -72,6 +72,7 @@ Future getPosts(BuildContext context, int postNumber) async {
     return response.data['data'];
   } on DioError catch (e) {
     handleError(e);
+    return [];
   }
 }
 
@@ -97,7 +98,8 @@ Future<bool> postAction(
   }
 }
 
-Future<bool> createPost(String username, String imageData, String caption) async {
+Future<bool> createPost(
+    String username, String imageData, String caption) async {
   var postUrl = apiUrl + "/api/user/posts";
 
   try {
@@ -115,5 +117,25 @@ Future<bool> createPost(String username, String imageData, String caption) async
   } on DioError catch (e) {
     handleError(e);
     return false;
+  }
+}
+
+Future getUserPosts(String username) async {
+  var postUrl = apiUrl + "/api/user/posts";
+
+  try {
+    Dio dio = Dio(
+      BaseOptions(
+        queryParameters: {
+          'token': token,
+          'username': username,
+        },
+      ),
+    );
+    var response = await dio.get(postUrl);
+    return response.data['data'];
+  } on DioError catch (e) {
+    handleError(e);
+    return [];
   }
 }
