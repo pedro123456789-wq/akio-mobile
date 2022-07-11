@@ -7,6 +7,11 @@ import 'package:provider/provider.dart';
 import '../state.dart';
 import 'create_post_dialog.dart';
 
+
+//TO add in the future:
+//Comments, Post captions
+
+
 class PhotoFeedPage extends StatefulWidget {
   const PhotoFeedPage({Key? key}) : super(key: key);
 
