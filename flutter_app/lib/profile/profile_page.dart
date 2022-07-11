@@ -27,8 +27,7 @@ class _ProfilePageState extends State<ProfilePage>
     _expandAnimation = Tween<Offset>(
       begin: const Offset(0.0, 1.0),
       end: Offset.zero,
-    ).chain(CurveTween(curve: Curves.easeOut))
-        .animate(_controller);
+    ).chain(CurveTween(curve: Curves.easeOut)).animate(_controller);
 
     _controller.forward();
   }
@@ -59,9 +58,9 @@ class _ProfilePageState extends State<ProfilePage>
         SlideTransition(
           child: Container(
             margin: EdgeInsets.only(
-              top: DeviceInfo.deviceHeight(context) * 0.20,
+              top: DeviceInfo.deviceHeight(context) * 0.1,
             ),
-            height: DeviceInfo.deviceHeight(context) * 0.60,
+            height: DeviceInfo.deviceHeight(context) * 0.7,
             decoration: const BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.all(
@@ -80,7 +79,7 @@ class _ProfilePageState extends State<ProfilePage>
                         username!,
                         style: const TextStyle(
                             color: Colors.black,
-                            fontSize: 25.0,
+                            fontSize: 27.0,
                             fontFamily: 'LibreBodoni'),
                       ),
                     ),
@@ -90,6 +89,81 @@ class _ProfilePageState extends State<ProfilePage>
                       size: DeviceInfo.deviceHeight(context) * 0.12,
                     )
                   ],
+                ),
+                Container(
+                  margin: EdgeInsets.only(
+                    top: DeviceInfo.deviceHeight(context) * 0.05,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Column(
+                        children: [
+                          Icon(
+                            Icons.monitor_heart,
+                            color: Colors.black,
+                            size: DeviceInfo.deviceWidth(context) * 0.15,
+                          ),
+                          const Text(
+                            'Likes: 2',
+                            style: TextStyle(color: Colors.black),
+                          )
+                        ],
+                      ),
+                      Column(
+                        children: [
+                          Icon(
+                            Icons.image,
+                            color: Colors.black,
+                            size: DeviceInfo.deviceWidth(context) * 0.15,
+                          ),
+                          const Text(
+                            'Posts: 5',
+                            style: TextStyle(color: Colors.black),
+                          )
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.only(
+                    top: DeviceInfo.deviceHeight(context) * 0.12,
+                  ),
+                  width: DeviceInfo.deviceWidth(context) * 0.85,
+                  child: ElevatedButton(
+                    style: ButtonStyle(
+                        backgroundColor:
+                            MaterialStateProperty.all(Colors.black)),
+                    onPressed: null,
+                    child: const Text(
+                      'Your Posts',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 22,
+                      ),
+                    ),
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.only(
+                      top: DeviceInfo.deviceHeight(context) * 0.01),
+                  width: DeviceInfo.deviceWidth(context) * 0.85,
+                  child: ElevatedButton(
+                    onPressed: null,
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(
+                        Colors.black,
+                      ),
+                    ),
+                    child: const Text(
+                      'Your Icon',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 22,
+                      ),
+                    ),
+                  ),
                 )
               ],
             ),
