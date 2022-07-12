@@ -8,6 +8,7 @@ from flask_server.app import app
 from flask_server.responses import custom_response
 from flask_server.validation_schemas import SessionValidation
 from flask_server.models import User
+from flask_server.util import extract_data
 
 
 # Todo: use utility function data extraction
@@ -23,11 +24,8 @@ def login_required(methods=None):
         def decorated(*args, **kwargs):
             if request.method in methods:
                 # for GET requests data will be sent in headers but for POST and PUT requests it will be sent as json in request body
-                if request.method == "GET":
-                    data = request.headers
-                    data = {k.lower(): v for k, v in data.items()} #convert headers to lowercase, since headers must be case insensitive
-                else:
-                    data = request.get_json()
+
+                data = extract_data()
                     
                 # check if headers are valid with json schema
                 try:
@@ -68,11 +66,7 @@ def admin_required(methods=None):
         @wraps(function)
         def decorated(*args, **kwargs):
             if request.method in methods:
-                if request.method == 'GET':
-                    data = request.headers
-                    data = {k.lower(): v for k, v in data.items()}
-                else:
-                    data = request.get_json()
+                data = extract_data()
 
                 username = data.get('username')
                 if username:
