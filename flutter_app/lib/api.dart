@@ -1,12 +1,12 @@
-import 'package:dio/dio.dart';
 import 'package:akio_mobile/state.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 // Android emulator localhost ip
-// const apiUrl = "http://10.0.2.2:8080"; // TODO: Set me to production url
-const apiUrl = "http://192.168.1.82:8080";
+const apiUrl = "http://10.0.2.2:8080"; // TODO: Set me to production url
+// const apiUrl = "http://192.168.1.82:8080";
 
 // Does not need to be under provider or anything as it will not have any impact on UI state.
 // Needs to be moved to saved state/localstorage sort of thing so it saves between app reload
@@ -146,14 +146,7 @@ Future<bool> addItem(String username, String uuid) async {
   var url = apiUrl + "/api/user/clothing-items";
 
   try {
-    var response = await Dio().post(
-      url,
-      data: {
-        'username': username,
-        'token': token,
-        'uuid': uuid
-      }
-    );
+    var response = await Dio().post(url, data: {'username': username, 'token': token, 'uuid': uuid});
 
     print(response.statusCode);
     print(response.data);
