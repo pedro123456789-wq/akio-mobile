@@ -141,8 +141,31 @@ Future getUserPosts(String username) async {
   }
 }
 
-Future<bool> addItem(String username, String uuid) {
-  var url = apiUrl + "/api/user/clothing-items"
+
+Future getUserProfile(String username) async {
+  var profileUrl = apiUrl + "/api/user/profile";
+
+  try{
+    Dio dio = Dio(
+      BaseOptions(
+        queryParameters: {
+          'token': token,
+          'username': username,
+        }
+      )
+    );
+
+    var response = await dio.get(profileUrl);
+    return response.data['data'];
+  } on DioError catch (e){
+    handleError(e);
+    return [];
+  }
+}
+
+
+Future<bool> addItem(String username, String uuid) async {
+  var url = apiUrl + "/api/user/clothing-items";
 
   try {
     var response = await Dio().post(
