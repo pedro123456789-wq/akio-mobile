@@ -91,10 +91,12 @@ class Like(db.Model):
 
 class ClothingItem(db.Model):
     __tablename__ = "clothing_item"
-    variant_id = db.Column(db.String(100), db.ForeignKey("clothing_variant.uuid"), primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
+
+    variant_id = db.Column(db.String(100), db.ForeignKey("clothing_variant.uuid"))
     variant = db.relationship("ClothingVariant", back_populates="owners")
 
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=True)
     user = db.relationship("User", back_populates="owned_clothes")
 
     uuid = db.Column(db.String(100), nullable=False)
