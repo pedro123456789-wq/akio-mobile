@@ -233,7 +233,7 @@ def user_clothes():
 
         if not uuid:  # Don't need to make sure it's valid, an invalid uuid just won't return any results.
             return custom_response(False, 'You did not provide a uuid')
-
+        print(uuid)
         target_user = User.query.filter_by(username=data.get('username')).first()
 
         target_item = ClothingItem.query.filter_by(uuid=uuid).first()
