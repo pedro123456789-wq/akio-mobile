@@ -93,7 +93,7 @@ def test_profile(client: "FlaskClient"):
 # So, we could compare the returned dictionary with the dictionarified one and they should be equal.
 # This code could be written in util.py, and shared between the test code and the actual code for ease of use
 
-def test_user_clothing_items():
+def test_user_clothing_items(client: "FlaskClient"):
     url = "/api/user/clothing-items"
 
     user = make_test_user()
@@ -142,8 +142,8 @@ def test_user_clothing_items():
     item = make_test_clothing_item(variant)
 
     response = client.post(url, json={
-        uuid=item3.uuid,
-        username=user.username
+        "uuid": item.uuid,
+        "username": user.username
     })
 
     assert response.status_code == 200
@@ -153,16 +153,16 @@ def test_user_clothing_items():
 
     
     bad_response = client.post(url, json={
-        uuid="SAIUFGIUSAFHBSA",
-        username=user.username
+        "uuid": "SAIUFGIUSAFHBSA",
+        "username": user.username
     })
 
     assert bad_response.status_code == 404
     assert bad_response.json.get("message") == "No clothing item found for that uuid"
 
     bad_response = client.post(url, json={
-        uuid=item3.uuid,
-        username="dshdshfsoidfiufoids"
+        "uuid": item.uuid,
+        "username": "dshdshfsoidfiufoids"
     })
 
     assert bad_response.status_code == 404
