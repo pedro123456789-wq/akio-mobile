@@ -172,11 +172,23 @@ def user_profile():
         return custom_response(False, "User not found")
 
     if request.method == 'GET':
+        # get number of likes recieved by user
+        # todo: do this in a query as this loop will be very slow for a large number of likes
+        #       or omit the liked value entirely
+        like_count = 0 
+        likes = Like.query.all()
+
+        for like in likes:
+            if like.post.poster == target_user:
+                like_count += 1
+
         output = {
             'username': data.get('username'),
             'background_colour': target_user.background_colour,  # hex value
             'clothing_id': target_user.clothing_id,
-            'image_url': f'clothing_images/{target_user.clothing_id}.png' if target_user.clothing_id is not None else None
+            'image_url': f'clothing_images/{target_user.clothing_id}.png' if target_user.clothing_id is not None else None, 
+            'posts': len(target_user.posts),
+            'likes': like_count
         }
 
         return custom_response(True, 'Got profile data successfully', data=output)
@@ -207,9 +219,9 @@ def user_clothes():
 
         output = [{
                     'uuid': item.uuid,
-                    'name': item.name,
-                    'size': Size.query.filter_by(id=item.size_id).first().size,
-                    'colour': Colour.query.filter_by(id=item.colour_id).first().colour,
+                    'name': item.variant.name,
+                    'size': item.variant.size.size,
+                    'colour': item.variant.colour.colour,
                     'image_data': f'clothing_images/{item.uuid}'
         } for item in owned_clothes]
 
@@ -223,7 +235,8 @@ def user_clothes():
             return custom_response(False, 'You did not provide a uuid')
 
         target_user = User.query.filter_by(username=data.get('username')).first()
-        target_item = ClothingVariant.query.filter_by(uuid=uuid).first()
+
+        target_item = ClothingItem.query.filter_by(uuid=uuid).first()
 
         if target_item:
             target_user.owned_clothes.append(target_item)
@@ -252,7 +265,7 @@ def user_posts():
             'caption': post.caption,
             'likes': len(post.liked_by),
             'image_url': f'post_images/{post.id}.png'
-        } for post in target_user.posts_made]
+        } for post in target_user.posts]
 
         return custom_response(True, 'Fetched data successfully', data=output)
 

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:nfc_manager/nfc_manager.dart';
+import 'package:provider/provider.dart';
 
 class ScanItemPage extends StatefulWidget {
   const ScanItemPage({Key? key}) : super(key: key);
@@ -11,7 +12,7 @@ class ScanItemPage extends StatefulWidget {
 }
 
 
-Future<void> processTag(NfcTag tag) async {
+Future<void> processTag(NfcTag tag, String username) async {
   Ndef? ndef = Ndef.from(tag);
   NdefMessage? data = await ndef?.read();
 
@@ -19,13 +20,17 @@ Future<void> processTag(NfcTag tag) async {
     Utf8Decoder decode = const Utf8Decoder();
     var records = data.records;
 
-    for (var record in records) {
-      var byteContent = record.payload;
+    String uuid = records[0];
 
-      String stringContents = decode.convert(byteContent);
+    addItem(username, uuid);
 
-      print(stringContents);
-    }
+    // for (var record in records) {
+    //   var byteContent = record.payload;
+
+    //   String stringContents = decode.convert(byteContent);
+
+    //   print(stringContents);
+    // }
   }
 }
 

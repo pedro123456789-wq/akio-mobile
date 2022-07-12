@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 const apiUrl = "http://10.0.2.2:8080"; // TODO: Set me to production url
 
 // Does not need to be under provider or anything as it will not have any impact on UI state.
+// Needs to be moved to saved state/localstorage sort of thing so it saves between app reload
 String? token;
 
 void handleError(DioError e) {
@@ -137,5 +138,25 @@ Future getUserPosts(String username) async {
   } on DioError catch (e) {
     handleError(e);
     return [];
+  }
+}
+
+Future<bool> addItem(String username, String uuid) {
+  var url = apiUrl + "/api/user/clothing-items"
+
+  try {
+    var response = await Dio().post(
+      url,
+      data: {
+        'username': username,
+        'token': token,
+        'uuid': uuid
+      }
+    );
+
+    return true;  // Try block will fail if response is a 400, so we can assume success.
+  } on DioError catch (e) {
+    handleError(e);
+    return false;
   }
 }
