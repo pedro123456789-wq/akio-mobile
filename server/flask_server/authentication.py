@@ -2,13 +2,16 @@ from functools import wraps
 import jwt
 from datetime import datetime
 from pydantic import ValidationError
+from flask import request
 
 from flask_server.app import app
 from flask_server.responses import custom_response
 from flask_server.validation_schemas import SessionValidation
 from flask_server.models import User
-from flask import request
 
+
+# Todo: use utility function data extraction
+# Need to pass token as a AUTHORISATION BEARER HEADER instead of in URL for security
 
 def login_required(methods=None):
     if methods is None:

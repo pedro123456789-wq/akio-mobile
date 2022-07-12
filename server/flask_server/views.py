@@ -207,9 +207,9 @@ def user_clothes():
 
         output = [{
                     'uuid': item.uuid,
-                    'name': item.name,
-                    'size': Size.query.filter_by(id=item.size_id).first().size,
-                    'colour': Colour.query.filter_by(id=item.colour_id).first().colour,
+                    'name': item.variant.name,
+                    'size': item.variant.size.size,
+                    'colour': item.variant.colour.colour,
                     'image_data': f'clothing_images/{item.uuid}'
         } for item in owned_clothes]
 
@@ -223,7 +223,8 @@ def user_clothes():
             return custom_response(False, 'You did not provide a uuid')
 
         target_user = User.query.filter_by(username=data.get('username')).first()
-        target_item = ClothingVariant.query.filter_by(uuid=uuid).first()
+
+        target_item = ClothingItem.query.filter_by(uuid=uuid).first()
 
         if target_item:
             target_user.owned_clothes.append(target_item)
