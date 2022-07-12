@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:nfc_manager/nfc_manager.dart';
 import 'package:provider/provider.dart';
 
+import '../api.dart';
+import '../state.dart';
+
 class ScanItemPage extends StatefulWidget {
   const ScanItemPage({Key? key}) : super(key: key);
 
@@ -20,7 +23,7 @@ Future<void> processTag(NfcTag tag, String username) async {
     Utf8Decoder decode = const Utf8Decoder();
     var records = data.records;
 
-    String uuid = records[0];
+    String uuid = decode.convert(records[0].payload);
 
     addItem(username, uuid);
 
@@ -37,6 +40,7 @@ Future<void> processTag(NfcTag tag, String username) async {
 
 class _ScanItemPageState extends State<ScanItemPage> {
   bool? _nfcAvailable;
+  String? username;
 
   @override
   void initState() {
@@ -58,7 +62,11 @@ class _ScanItemPageState extends State<ScanItemPage> {
 
     if (_nfcAvailable == true) {
       NfcManager.instance.startSession(
-        onDiscovered: processTag
+        onDiscovered: (NfcTag tag) async {
+          if (username != null) {
+            await processTag(tag, username!);
+          }
+        }
       );
     }
   }
@@ -93,6 +101,8 @@ class _ScanItemPageState extends State<ScanItemPage> {
 
   @override
   Widget build(BuildContext context) {
+    username = Provider.of<AppModel>(context, listen: false).username;
+
     return
         Scaffold(
         appBar: AppBar(
