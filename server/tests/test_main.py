@@ -94,7 +94,7 @@ def test_profile(client: "FlaskClient"):
 # So, we could compare the returned dictionary with the dictionarified one and they should be equal.
 # This code could be written in util.py, and shared between the test code and the actual code for ease of use
 
-def test_user_clothing_items(client: "FlaskClient"):
+def _test_user_clothing_items(client: "FlaskClient"):
     url = "/api/user/clothing-items"
 
     user = make_test_user()
