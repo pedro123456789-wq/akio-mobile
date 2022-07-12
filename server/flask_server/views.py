@@ -76,7 +76,7 @@ def login():
         target_password = target_user.hashed_password
 
         if encryption_handler.check_password_hash(target_password, password):
-            token = encode({"username": username, "exp": datetime.utcnow() + timedelta(hours=TOKEN_EXPIRATION_HOURS)}, app.config["SECRET_KEY"]).decode()
+            token = encode({"username": username, "exp": datetime.utcnow() + timedelta(hours=TOKEN_EXPIRATION_HOURS)}, app.config["SECRET_KEY"], algorithm="HS256")
             return custom_response(True, "Login Completed", token=str(token))
         else:
             return custom_response(False, "Incorrect password")

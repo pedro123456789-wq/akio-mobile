@@ -3,50 +3,10 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from flask.testing import FlaskClient
 
-from flask_server.app import db as app_db, encryption_handler
 from flask_server.models import User, ClothingVariant, Size, Colour, ClothingItem
-from pathlib import Path
-from uuid import uuid4 as uuid
-
-from conftest import IMAGE_FILE_PARENT_DIRECTORY
+from conftest import make_test_user, make_test_clothing_item, make_test_clothing_variant, make_test_passworded_user, login
 
 # Aim for 100% code coverage
-
-
-def make_test_user():
-    new_user = User(
-        username=uuid().hex[:8],
-        hashed_password=encryption_handler.generate_password_hash("test_password").decode()
-    )
-    app_db.session.add(new_user)
-    return new_user
-
-
-def make_test_clothing_variant():
-    new_clothing = ClothingVariant(
-        uuid=uuid().hex,
-        name="A test hoodie",
-        size=(Size(size="Medium")),
-        colour=(Colour(colour="Blue"))
-    )
-
-    with open(IMAGE_FILE_PARENT_DIRECTORY.joinpath(Path(f"./clothing_images/test.png")).resolve(), "rb") as original_file:
-        with open(IMAGE_FILE_PARENT_DIRECTORY.joinpath(Path(f"./clothing_images/{new_clothing.uuid}")).resolve(), "wb") as new_file:
-            new_file.write(original_file.read())
-
-    app_db.session.add(new_clothing)
-    return new_clothing
-
-
-def make_test_clothing_item(variant: ClothingVariant, user=None):
-    clothing_item = ClothingItem(
-        variant=variant,
-        uuid=uuid().hex,
-        user=user
-    )
-
-    app_db.session.add(clothing_item)
-    return clothing_item
 
 
 # Todo: Test post count
@@ -94,57 +54,61 @@ def test_profile(client: "FlaskClient"):
 # So, we could compare the returned dictionary with the dictionarified one and they should be equal.
 # This code could be written in util.py, and shared between the test code and the actual code for ease of use
 
-def _test_user_clothing_items(client: "FlaskClient"):
+def test_user_clothing_items(client: "FlaskClient"):
     url = "/api/user/clothing-items"
 
-    user = make_test_user()
-    user2 = make_test_user()
+    user, pw = make_test_passworded_user()
+    user2, pw2 = make_test_passworded_user()
     variant = make_test_clothing_variant()
     variant2 = make_test_clothing_variant()
     item = make_test_clothing_item(variant, user)
     item2 = make_test_clothing_item(variant2, user2)
 
-    # todo: login
+    token = login(user.username, pw, client)
 
-    response = client.get(f"{url}?username={user.username}")
+    response = client.get(f"{url}?username={user.username}&token={token}")
     data = response.json.get("data")
     
     assert response.status_code == 200
     assert data is not None
     assert len(data) == 1
     response_item = data[0]
-    assert response_item.uuid == item.uuid
-    assert response_item.name == item.variant.name
-    assert response_item.size == item.variant.size.size
-    assert response_item.colour == item.variant.colour.colour
-    assert response_item.image_data == f"clothing_images/{response_item.uuid}"
+    assert response_item["uuid"] == item.uuid
+    assert response_item["name"] == item.variant.name
+    assert response_item["size"] == item.variant.size.size
+    assert response_item["colour"] == item.variant.colour.colour
+    assert response_item["image_data"] == f"clothing_images/{response_item['uuid']}"
 
-    response = client.get(f"{url}?username={user2.username}")
+    token = login(user2.username, pw2, client)
+
+    response = client.get(f"{url}?username={user2.username}&token={token}")
     data = response.json.get("data")
 
     assert response.status_code == 200
     assert data is not None
     assert len(data) == 1
     response_item = data[0]
-    assert response_item.uuid == item2.uuid
-    assert response_item.name == item2.variant.name
-    assert response_item.size == item2.variant.size.size
-    assert response_item.colour == item2.variant.colour.colour
-    assert response_item.image_data == f"clothing_images/{response_item.uuid}"
+    assert response_item["uuid"] == item2.uuid
+    assert response_item["name"] == item2.variant.name
+    assert response_item["size"] == item2.variant.size.size
+    assert response_item["colour"] == item2.variant.colour.colour
+    assert response_item["image_data"] == f"clothing_images/{response_item['uuid']}"
 
 
-    bad_response = client.get(f"{url}?username=THISNAMEDOESNOTEXIST")
+    bad_response = client.get(f"{url}?username=THISNAMEDOESNOTEXIST&token={token}")
     assert bad_response.status_code == 404
-    assert bad_response.json.get("message") == "Invalid username"
-    
+
 
     # Possibly extract this test into a class, and test the get and post separately
-    user = make_test_user()
+    user, pw = make_test_passworded_user()
     item = make_test_clothing_item(variant)
+
+    token = login(user.username, pw, client)
 
     response = client.post(url, json={
         "uuid": item.uuid,
-        "username": user.username
+        "username": user.username,
+        "token": token
     })
 
     assert response.status_code == 200
@@ -155,7 +119,8 @@ def _test_user_clothing_items(client: "FlaskClient"):
     
     bad_response = client.post(url, json={
         "uuid": "SAIUFGIUSAFHBSA",
-        "username": user.username
+        "username": user.username,
+        "token": token
     })
 
     assert bad_response.status_code == 404
@@ -163,7 +128,8 @@ def _test_user_clothing_items(client: "FlaskClient"):
 
     bad_response = client.post(url, json={
         "uuid": item.uuid,
-        "username": "dshdshfsoidfiufoids"
+        "username": "dshdshfsoidfiufoids",
+        "token": token
     })
 
     assert bad_response.status_code == 404

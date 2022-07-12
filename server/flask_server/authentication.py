@@ -42,7 +42,7 @@ def login_required(methods=None):
 
                 # check if token is valid and has not expired
                 try:
-                    decoded_token = jwt.decode(token, app.config["SECRET_KEY"])
+                    decoded_token = jwt.decode(token, app.config["SECRET_KEY"], algorithms=["HS256"])
                     token_username, token_expiration = decoded_token.get("username"), decoded_token.get("exp")
 
                     if token_username != username:
