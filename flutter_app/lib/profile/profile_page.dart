@@ -1,4 +1,5 @@
 import 'package:akio_mobile/device_info.dart';
+import 'package:akio_mobile/profile/posts_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -135,7 +136,14 @@ class _ProfilePageState extends State<ProfilePage>
                     style: ButtonStyle(
                         backgroundColor:
                             MaterialStateProperty.all(Colors.black)),
-                    onPressed: null,
+                    onPressed: () => {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return const PostsPage();
+                        },
+                      )
+                    },
                     child: const Text(
                       'Your Posts',
                       style: TextStyle(

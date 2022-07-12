@@ -12,7 +12,7 @@ class ScanItemPage extends StatefulWidget {
 }
 
 
-Future<void> processTag(NfcTag tag, String username) async {
+Future<void> processTag(NfcTag tag) async {
   Ndef? ndef = Ndef.from(tag);
   NdefMessage? data = await ndef?.read();
 
@@ -20,9 +20,9 @@ Future<void> processTag(NfcTag tag, String username) async {
     Utf8Decoder decode = const Utf8Decoder();
     var records = data.records;
 
-    String uuid = records[0];
-
-    addItem(username, uuid);
+    // String uuid = records[0];
+    //
+    // addItem(username, uuid);
 
     // for (var record in records) {
     //   var byteContent = record.payload;
