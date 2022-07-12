@@ -12,6 +12,7 @@ from flask_server.models import User
 
 # Todo: use utility function data extraction
 # Need to pass token as a AUTHORISATION BEARER HEADER instead of in URL for security
+# ^ Because currently we cant read it when its sent as part of a get request
 
 def login_required(methods=None):
     if methods is None:
@@ -39,7 +40,7 @@ def login_required(methods=None):
 
                 username, token = data.get("username"), data.get("token")
                 
-                print(token)
+                # print(token)
 
                 # check if token is valid and has not expired
                 try:
