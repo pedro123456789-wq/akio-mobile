@@ -172,11 +172,21 @@ def user_profile():
         return custom_response(False, "User not found")
 
     if request.method == 'GET':
+        # get number of likes recieved by user
+        like_count = 0 
+        likes = Like.query.all()
+
+        for like in likes:
+            if like.post.poster == target_user:
+                like_count += 1
+
         output = {
             'username': data.get('username'),
             'background_colour': target_user.background_colour,  # hex value
             'clothing_id': target_user.clothing_id,
-            'image_url': f'clothing_images/{target_user.clothing_id}.png' if target_user.clothing_id is not None else None
+            'image_url': f'clothing_images/{target_user.clothing_id}.png' if target_user.clothing_id is not None else None, 
+            'posts': len(target_user.posts),
+            'likes': like_count
         }
 
         return custom_response(True, 'Got profile data successfully', data=output)
