@@ -263,7 +263,7 @@ def user_posts():
             'caption': post.caption,
             'likes': len(post.liked_by),
             'image_url': f'post_images/{post.id}.png'
-        } for post in target_user.posts_made]
+        } for post in target_user.posts]
 
         return custom_response(True, 'Fetched data successfully', data=output)
 

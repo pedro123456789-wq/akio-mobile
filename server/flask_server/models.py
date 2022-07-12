@@ -25,7 +25,7 @@ class User(db.Model):
     background_colour = db.Column(db.String(100), nullable=True) # hex value
 
     # posted posts 
-    posts_made = db.relationship("Post", back_populates="poster")
+    posts = db.relationship("Post", back_populates="poster")
 
     # Posts
     liked_posts = db.relationship("Like", back_populates="user")
@@ -75,7 +75,7 @@ class Post(db.Model):
     caption = db.Column(db.String(100), nullable = False)
 
     poster_id = db.Column(db.Integer, db.ForeignKey("user.id"))
-    poster = db.relationship("User", back_populates="posts_made")
+    poster = db.relationship("User", back_populates="posts")
     liked_by = db.relationship("Like", back_populates="post")
 
 
