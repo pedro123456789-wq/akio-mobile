@@ -49,6 +49,7 @@ def make_test_clothing_item(variant: ClothingVariant, user=None):
     return clothing_item
 
 
+# Todo: Test post count
 def test_profile(client: "FlaskClient"):
     new_user = make_test_user()
 
@@ -57,7 +58,7 @@ def test_profile(client: "FlaskClient"):
     assert get_response.json.get('message') == "Got profile data successfully"
     data = get_response.json.get('data')
     assert data is not None
-    assert data == {'username': new_user.username, 'background_colour': None, 'clothing_id': None, 'image_url': None}
+    assert data == {'username': new_user.username, 'background_colour': None, 'clothing_id': None, 'image_url': None, 'posts': 0, 'likes': 0}
 
     bad_response = client.get(f'/api/user/profile?username=doesnotexist')
     assert bad_response.status_code == 404

@@ -173,6 +173,8 @@ def user_profile():
 
     if request.method == 'GET':
         # get number of likes recieved by user
+        # todo: do this in a query as this loop will be very slow for a large number of likes
+        #       or omit the liked value entirely
         like_count = 0 
         likes = Like.query.all()
 
